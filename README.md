@@ -1,4 +1,4 @@
-# Recipe App Workspace
+# Recipe App 
 
 A monorepo workspace for the Recipe application using pnpm workspaces.
 
