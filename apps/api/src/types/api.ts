@@ -1,5 +1,3 @@
-// API-specific types and interfaces
-
 export interface ApiResponse<T> {
 	success: boolean;
 	data?: T;
@@ -26,4 +24,44 @@ export interface CreateFavoriteRequest {
 
 export interface UpdateFavoriteRequest extends Partial<CreateFavoriteRequest> {
 	id: number;
+}
+
+export interface SaveAIRecipeRequest {
+	userId: string;
+	recipeName: string;
+	ingredients: string[];
+	instructions: string[];
+	imageData: string;
+	imageMimeType: string;
+}
+
+export interface SaveAIRecipeResponse {
+	id: number;
+	userId: string;
+	recipeName: string;
+	ingredients: string[];
+	instructions: string[];
+	imageData: string;
+	imageMimeType: string;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
+export interface GenerateRecipeFromImageInput {
+	photoDataUri: string;
+}
+
+export interface GenerateRecipeFromImageOutput {
+	recipeName: string;
+	ingredients: string[];
+	instructions: string[];
+}
+
+export interface IdentifyDishFromImageInput {
+	photoDataUri: string;
+}
+
+export interface IdentifyDishFromImageOutput {
+	dishName: string;
+	confidence: number;
 }

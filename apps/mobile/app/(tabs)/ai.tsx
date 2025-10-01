@@ -23,11 +23,16 @@ import {
 export default function AIScreen() {
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
 	const [results, setResults] = useState<{
 		type: AIFeature;
 		data: GenerateRecipeFromImageOutput | IdentifyDishFromImageOutput;
 	} | null>(null);
 	const [error, setError] = useState<string | null>(null);
+
+	// For demo purposes, using a hardcoded user ID
+	// In a real app, this would come from authentication
+	const userId = 'user123';
 
 	const requestCameraPermissions = async () => {
 		const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -145,6 +150,52 @@ export default function AIScreen() {
 		setError(null);
 	};
 
+	const saveRecipe = async () => {
+		if (!results || !selectedImage || results.type !== 'generate-recipe') {
+			Alert.alert('Error', 'No recipe to save');
+			return;
+		}
+
+		setIsSaving(true);
+
+		try {
+			// Convert image to data URI
+			const dataUri = await aiService.convertImageToDataUri(selectedImage);
+
+			// Extract base64 data and MIME type from data URI
+			const [header, base64Data] = dataUri.split(',');
+			const mimeType = header.match(/data:([^;]+)/)?.[1] || 'image/jpeg';
+
+			const recipe = results.data as GenerateRecipeFromImageOutput;
+
+			const saveResponse = await aiService.saveAIRecipe({
+				userId,
+				recipeName: recipe.recipeName,
+				ingredients: recipe.ingredients,
+				instructions: recipe.instructions,
+				imageData: base64Data,
+				imageMimeType: mimeType,
+			});
+
+			if (saveResponse.success) {
+				Alert.alert(
+					'Success! 🎉',
+					'Recipe saved successfully! You can find it in your favorites.',
+					[{ text: 'OK' }]
+				);
+			} else {
+				throw new Error(saveResponse.error || 'Failed to save recipe');
+			}
+		} catch (error) {
+			console.error('Error saving recipe:', error);
+			Alert.alert('Error', 'Failed to save recipe. Please try again.', [
+				{ text: 'OK' },
+			]);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
 	const renderResults = () => {
 		if (!results) return null;
 
@@ -167,19 +218,54 @@ export default function AIScreen() {
 					<Text style={aiStyles.recipeName}>{data.recipeName}</Text>
 
 					<Text style={aiStyles.sectionTitle}>Ingredients:</Text>
-					{data.ingredients.map((ingredient, index) => (
-						<Text key={index} style={aiStyles.ingredientItem}>
-							• {ingredient}
+					{data.ingredients && data.ingredients.length > 0 ? (
+						data.ingredients.map((ingredient, index) => (
+							<Text key={index} style={aiStyles.ingredientItem}>
+								• {ingredient}
+							</Text>
+						))
+					) : (
+						<Text style={aiStyles.ingredientItem}>
+							No ingredients available
 						</Text>
-					))}
+					)}
 
 					<Text style={aiStyles.sectionTitle}>Instructions:</Text>
-					{data.instructions.map((instruction, index) => (
-						<Text key={index} style={aiStyles.instructionItem}>
-							<Text style={aiStyles.instructionNumber}>{index + 1}.</Text>{' '}
-							{instruction}
+					{data.instructions && data.instructions.length > 0 ? (
+						data.instructions.map((instruction, index) => (
+							<Text key={index} style={aiStyles.instructionItem}>
+								<Text style={aiStyles.instructionNumber}>{index + 1}.</Text>{' '}
+								{instruction}
+							</Text>
+						))
+					) : (
+						<Text style={aiStyles.instructionItem}>
+							No instructions available
 						</Text>
-					))}
+					)}
+
+					{/* Save Recipe Button */}
+					<TouchableOpacity
+						style={[
+							aiStyles.actionButton,
+							{
+								backgroundColor: '#4CAF50', // Green color for save
+								marginTop: 20,
+								opacity: isSaving ? 0.7 : 1,
+							},
+						]}
+						onPress={saveRecipe}
+						disabled={isSaving}
+					>
+						{isSaving ? (
+							<ActivityIndicator size='small' color={COLORS.white} />
+						) : (
+							<Ionicons name='bookmark' size={20} color={COLORS.white} />
+						)}
+						<Text style={aiStyles.buttonText}>
+							{isSaving ? 'Saving...' : 'Save Recipe'}
+						</Text>
+					</TouchableOpacity>
 				</View>
 			);
 		}

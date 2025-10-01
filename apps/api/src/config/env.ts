@@ -5,6 +5,7 @@ interface Environment {
 	DATABASE_URL: string;
 	NODE_ENV: string | undefined;
 	API_URL: string | undefined;
+	GOOGLE_GENAI_API_KEY: string | undefined;
 }
 
 export const ENV: Environment = {
@@ -12,4 +13,5 @@ export const ENV: Environment = {
 	DATABASE_URL: process.env.DATABASE_URL!,
 	NODE_ENV: process.env.NODE_ENV,
 	API_URL: process.env.API_URL,
+	GOOGLE_GENAI_API_KEY: process.env.GOOGLE_GENAI_API_KEY,
 };

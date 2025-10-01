@@ -19,6 +19,27 @@ export interface IdentifyDishFromImageOutput {
 	confidence: number; // 0-1 confidence level
 }
 
+export interface SaveAIRecipeInput {
+	userId: string;
+	recipeName: string;
+	ingredients: string[];
+	instructions: string[];
+	imageData: string; // base64 encoded image data
+	imageMimeType: string; // e.g., 'image/jpeg'
+}
+
+export interface SaveAIRecipeOutput {
+	id: number;
+	userId: string;
+	recipeName: string;
+	ingredients: string[];
+	instructions: string[];
+	imageData: string;
+	imageMimeType: string;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
 export interface AIServiceResponse<T> {
 	success: boolean;
 	data?: T;
