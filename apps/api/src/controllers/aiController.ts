@@ -1,6 +1,8 @@
 import { prisma } from '../config/db';
 import { Request, Response } from 'express';
 import { ENV } from '../config/env';
+import AsyncHandler from '../middleware/AsyncHandler';
+import { BadRequestError } from '../utils/errors';
 import type {
 	GenerateRecipeFromImageInput,
 	GenerateRecipeFromImageOutput,
@@ -13,37 +15,30 @@ import type {
 import { identifyDishFromImage } from '../ai/flows/identify-dish-from-image';
 import { generateRecipeFromImage } from '../ai/flows/generate-recipe-from-image';
 
-
 export class AIController {
 	/**
 	 * Identify dish from image
 	 */
-	static async identifyDish(
-		req: Request<
-			{},
-			ApiResponse<IdentifyDishFromImageOutput>,
-			IdentifyDishFromImageInput
-		>,
-		res: Response<ApiResponse<IdentifyDishFromImageOutput>>
-	): Promise<void> {
-		try {
+	static identifyDish = AsyncHandler(
+		async (
+			req: Request<
+				{},
+				ApiResponse<IdentifyDishFromImageOutput>,
+				IdentifyDishFromImageInput
+			>,
+			res: Response<ApiResponse<IdentifyDishFromImageOutput>>
+		): Promise<void> => {
 			const { photoDataUri } = req.body;
 
 			if (!photoDataUri) {
-				res.status(400).json({
-					success: false,
-					error: 'Missing required field: photoDataUri',
-				});
-				return;
+				throw new BadRequestError('Missing required field: photoDataUri');
 			}
 
-			// Check if Google AI API key is configured
 			if (!ENV.GOOGLE_GENAI_API_KEY) {
 				console.warn(
 					'Google AI API key not configured, using fallback response'
 				);
 
-				// Fallback mock response when API key is not configured
 				const mockDishes = [
 					'Pasta Carbonara',
 					'Chicken Curry',
@@ -64,57 +59,44 @@ export class AIController {
 					success: true,
 					data: {
 						dishName: randomDish!,
-						confidence: Math.random() * 0.3 + 0.7, // 0.7 to 1.0
+						confidence: Math.random() * 0.3 + 0.7,
 					},
 				});
 				return;
 			}
 
-			// Use actual AI implementation
 			const result = await identifyDishFromImage({ photoDataUri });
 
 			res.status(200).json({
 				success: true,
 				data: result,
 			});
-		} catch (error) {
-			console.error('Error identifying dish:', error);
-			res.status(500).json({
-				success: false,
-				error: 'Internal server error',
-			});
 		}
-	}
+	);
 
 	/**
 	 * Generate recipe from image
 	 */
-	static async generateRecipe(
-		req: Request<
-			{},
-			ApiResponse<GenerateRecipeFromImageOutput>,
-			GenerateRecipeFromImageInput
-		>,
-		res: Response<ApiResponse<GenerateRecipeFromImageOutput>>
-	): Promise<void> {
-		try {
+	static generateRecipe = AsyncHandler(
+		async (
+			req: Request<
+				{},
+				ApiResponse<GenerateRecipeFromImageOutput>,
+				GenerateRecipeFromImageInput
+			>,
+			res: Response<ApiResponse<GenerateRecipeFromImageOutput>>
+		): Promise<void> => {
 			const { photoDataUri } = req.body;
 
 			if (!photoDataUri) {
-				res.status(400).json({
-					success: false,
-					error: 'Missing required field: photoDataUri',
-				});
-				return;
+				throw new BadRequestError('Missing required field: photoDataUri');
 			}
 
-			// Check if Google AI API key is configured
 			if (!ENV.GOOGLE_GENAI_API_KEY) {
 				console.warn(
 					'Google AI API key not configured, using fallback response'
 				);
 
-				// Fallback mock response when API key is not configured
 				const mockRecipes = [
 					{
 						recipeName: 'Delicious Pasta Carbonara',
@@ -172,30 +154,23 @@ export class AIController {
 				return;
 			}
 
-			// Use actual AI implementation
 			const result = await generateRecipeFromImage({ photoDataUri });
 
 			res.status(200).json({
 				success: true,
 				data: result,
 			});
-		} catch (error) {
-			console.error('Error generating recipe:', error);
-			res.status(500).json({
-				success: false,
-				error: 'Internal server error',
-			});
 		}
-	}
+	);
 
 	/**
 	 * Save an AI-generated recipe
 	 */
-	static async saveRecipe(
-		req: Request<{}, ApiResponse<SaveAIRecipeResponse>, SaveAIRecipeRequest>,
-		res: Response<ApiResponse<SaveAIRecipeResponse>>
-	): Promise<void> {
-		try {
+	static saveRecipe = AsyncHandler(
+		async (
+			req: Request<{}, ApiResponse<SaveAIRecipeResponse>, SaveAIRecipeRequest>,
+			res: Response<ApiResponse<SaveAIRecipeResponse>>
+		): Promise<void> => {
 			const {
 				userId,
 				recipeName,
@@ -212,15 +187,11 @@ export class AIController {
 				!instructions ||
 				!imageData
 			) {
-				res.status(400).json({
-					success: false,
-					error:
-						'Missing required fields: userId, recipeName, ingredients, instructions, imageData',
-				});
-				return;
+				throw new BadRequestError(
+					'Missing required fields: userId, recipeName, ingredients, instructions, imageData'
+				);
 			}
 
-			// Save the AI recipe to the database
 			const newAIRecipe = await prisma.aiRecipe.create({
 				data: {
 					userId,
@@ -246,23 +217,17 @@ export class AIController {
 					updatedAt: newAIRecipe.updatedAt,
 				},
 			});
-		} catch (error) {
-			console.error('Error saving AI recipe:', error);
-			res.status(500).json({
-				success: false,
-				error: 'Internal server error',
-			});
 		}
-	}
+	);
 
 	/**
 	 * Get all AI recipes for a user
 	 */
-	static async getRecipesByUser(
-		req: Request<{ userId: string }>,
-		res: Response<ApiResponse<any[]>>
-	): Promise<void> {
-		try {
+	static getRecipesByUser = AsyncHandler(
+		async (
+			req: Request<{ userId: string }>,
+			res: Response<ApiResponse<any[]>>
+		): Promise<void> => {
 			const { userId } = req.params;
 
 			const userAIRecipes = await prisma.aiRecipe.findMany({
@@ -278,23 +243,17 @@ export class AIController {
 				success: true,
 				data: userAIRecipes,
 			});
-		} catch (error) {
-			console.error('Error fetching AI recipes:', error);
-			res.status(500).json({
-				success: false,
-				error: 'Internal server error',
-			});
 		}
-	}
+	);
 
 	/**
 	 * Delete an AI recipe
 	 */
-	static async deleteRecipe(
-		req: Request<{ userId: string; recipeId: string }>,
-		res: Response<ApiResponse<{ message: string }>>
-	): Promise<void> {
-		try {
+	static deleteRecipe = AsyncHandler(
+		async (
+			req: Request<{ userId: string; recipeId: string }>,
+			res: Response<ApiResponse<{ message: string }>>
+		): Promise<void> => {
 			const { userId, recipeId } = req.params;
 
 			await prisma.aiRecipe.deleteMany({
@@ -308,12 +267,6 @@ export class AIController {
 				success: true,
 				data: { message: 'AI recipe deleted successfully' },
 			});
-		} catch (error) {
-			console.error('Error deleting AI recipe:', error);
-			res.status(500).json({
-				success: false,
-				error: 'Internal server error',
-			});
 		}
-	}
+	);
 }
