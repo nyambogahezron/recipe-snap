@@ -50,6 +50,15 @@ const TabsLayout = (): React.ReactElement | null => {
 				}}
 			/>
 			<Tabs.Screen
+				name='ai'
+				options={{
+					title: 'AI',
+					tabBarIcon: ({ color, size }) => (
+						<Ionicons name='camera' size={size} color={color} />
+					),
+				}}
+			/>
+			<Tabs.Screen
 				name='favorites'
 				options={{
 					title: 'Favorites',
