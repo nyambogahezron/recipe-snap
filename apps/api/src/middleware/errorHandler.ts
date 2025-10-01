@@ -13,9 +13,9 @@ interface PostgresError extends Error {
 
 export default function ErrorHandlerMiddleware(
 	err: Error | PostgresError,
-	req: Request,
+	_req: Request,
 	res: Response,
-	next: NextFunction
+	_next: NextFunction
 ): void {
 	// default error
 	let customError = new CustomError({
