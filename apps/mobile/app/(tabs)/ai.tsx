@@ -13,7 +13,7 @@ import * as ImagePicker from 'expo-image-picker';
 import SafeScreen from '../../components/SafeScreen';
 import { aiService } from '../../services/ai/aiService';
 import { aiStyles } from '../../assets/styles/ai.styles';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '@/constants/colors';
 import {
 	AIFeature,
 	GenerateRecipeFromImageOutput,

@@ -2,10 +2,13 @@ import React from 'react';
 import { useAuth } from '@clerk/clerk-expo';
 import { Redirect, Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '@/constants/colors';
+import { FONTS } from '@/constants/fonts';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TabsLayout = (): React.ReactElement | null => {
 	const { isSignedIn, isLoaded } = useAuth();
+	const insets = useSafeAreaInsets();
 
 	if (!isLoaded) return null;
 
@@ -21,13 +24,13 @@ const TabsLayout = (): React.ReactElement | null => {
 					backgroundColor: COLORS.white,
 					borderTopColor: COLORS.border,
 					borderTopWidth: 1,
-					paddingBottom: 8,
+					paddingBottom: insets.bottom,
 					paddingTop: 8,
-					height: 80,
+					height: 100,
 				},
 				tabBarLabelStyle: {
 					fontSize: 12,
-					fontWeight: '600',
+					fontFamily: FONTS.semibold,
 				},
 			}}
 		>

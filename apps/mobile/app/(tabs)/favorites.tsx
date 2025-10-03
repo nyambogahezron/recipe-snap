@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { API_URL } from '../../constants/api';
 import { aiService } from '../../services/ai/aiService';
 import { favoritesStyles } from '../../assets/styles/favorites.styles';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import RecipeCard from '../../components/RecipeCard';
 import NoFavoritesFound from '../../components/NoFavoritesFound';

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 interface LoadingSpinnerProps {
 	message?: string;
@@ -37,5 +38,6 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		color: COLORS.textLight,
 		textAlign: 'center',
+		fontFamily: FONTS.regular,
 	},
 });

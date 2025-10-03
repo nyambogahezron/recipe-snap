@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '@/constants/colors';
+import { FONTS } from '@/constants/fonts';
 
 export const aiStyles = StyleSheet.create({
 	container: {
@@ -10,7 +11,7 @@ export const aiStyles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 28,
-		fontWeight: 'bold',
+		fontFamily: FONTS.bold,
 		color: COLORS.text,
 		marginBottom: 10,
 	},
@@ -19,6 +20,7 @@ export const aiStyles = StyleSheet.create({
 		color: COLORS.textLight,
 		marginBottom: 30,
 		lineHeight: 22,
+		fontFamily: FONTS.regular,
 	},
 	buttonContainer: {
 		gap: 20,
@@ -52,7 +54,7 @@ export const aiStyles = StyleSheet.create({
 	buttonText: {
 		color: COLORS.white,
 		fontSize: 16,
-		fontWeight: '600',
+		fontFamily: FONTS.semibold,
 	},
 	secondaryButtonText: {
 		color: COLORS.primary,
@@ -110,13 +112,13 @@ export const aiStyles = StyleSheet.create({
 	},
 	resultTitle: {
 		fontSize: 20,
-		fontWeight: 'bold',
+		fontFamily: FONTS.bold,
 		color: COLORS.text,
 		marginBottom: 15,
 	},
 	dishName: {
 		fontSize: 18,
-		fontWeight: '600',
+		fontFamily: FONTS.semibold,
 		color: COLORS.primary,
 		marginBottom: 8,
 	},
@@ -124,16 +126,17 @@ export const aiStyles = StyleSheet.create({
 		fontSize: 14,
 		color: COLORS.textLight,
 		marginBottom: 15,
+		fontFamily: FONTS.regular,
 	},
 	recipeName: {
 		fontSize: 18,
-		fontWeight: 'bold',
+		fontFamily: FONTS.bold,
 		color: COLORS.text,
 		marginBottom: 15,
 	},
 	sectionTitle: {
 		fontSize: 16,
-		fontWeight: '600',
+		fontFamily: FONTS.semibold,
 		color: COLORS.text,
 		marginTop: 15,
 		marginBottom: 10,
@@ -143,6 +146,7 @@ export const aiStyles = StyleSheet.create({
 		color: COLORS.text,
 		paddingVertical: 4,
 		paddingLeft: 10,
+		fontFamily: FONTS.regular,
 	},
 	instructionItem: {
 		fontSize: 14,
@@ -150,9 +154,10 @@ export const aiStyles = StyleSheet.create({
 		paddingVertical: 6,
 		paddingLeft: 10,
 		lineHeight: 20,
+		fontFamily: FONTS.regular,
 	},
 	instructionNumber: {
-		fontWeight: '600',
+		fontFamily: FONTS.semibold,
 		color: COLORS.primary,
 	},
 	loadingContainer: {
@@ -199,7 +204,7 @@ export const aiStyles = StyleSheet.create({
 	resetButtonText: {
 		color: COLORS.white,
 		fontSize: 14,
-		fontWeight: '500',
+		fontFamily: FONTS.medium,
 		textAlign: 'center',
 	},
 });
