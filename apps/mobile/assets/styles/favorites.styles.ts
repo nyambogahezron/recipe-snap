@@ -57,6 +57,18 @@ export const favoritesStyles = StyleSheet.create({
 		shadowRadius: 4,
 		elevation: 2,
 	},
+	statNumber: {
+		fontSize: 24,
+		fontFamily: FONTS.bold,
+		color: COLORS.primary,
+		marginBottom: 4,
+	},
+	statLabel: {
+		fontSize: 12,
+		fontFamily: FONTS.regular,
+		color: COLORS.textLight,
+		textAlign: 'center',
+	},
 	statIcon: {
 		width: 40,
 		height: 40,

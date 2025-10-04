@@ -15,7 +15,7 @@ import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import CategoryFilter from '@/components/CategoryFilter';
 import RecipeCard from '@/components/RecipeCard';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import HomeScreenSkeleton from '@/components/Skeletons/HomeScreenSkeleton';
 import { CategoryData, Recipe } from '@/types';
 
 const HomeScreen = (): React.ReactElement => {
@@ -95,10 +95,9 @@ const HomeScreen = (): React.ReactElement => {
 
 	useEffect(() => {
 		loadData();
-	}, []);
+	}, [loadData]);
 
-	if (loading && !refreshing)
-		return <LoadingSpinner message='Loading delicions recipes...' />;
+	if (loading && !refreshing) return <HomeScreenSkeleton />;
 
 	return (
 		<View style={homeStyles.container}>

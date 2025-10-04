@@ -3,17 +3,18 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { COLORS } from '../constants/colors';
-import { recipeCardStyles } from '../assets/styles/home.styles';
-import { RecipeCardProps } from '../types';
+import { COLORS } from '@/constants/colors';
+import { recipeCardStyles } from '@/assets/styles/home.styles';
+import { RecipeCardProps } from '@/types';
 
-export default function RecipeCard({ recipe }: RecipeCardProps) {
+export default function RecipeCard({ recipe, onLongPress }: RecipeCardProps) {
 	const router = useRouter();
 
 	return (
 		<TouchableOpacity
 			style={recipeCardStyles.container}
 			onPress={() => router.push(`/recipe/${recipe.id}`)}
+			onLongPress={onLongPress}
 			activeOpacity={0.8}
 		>
 			<View style={recipeCardStyles.imageContainer}>

@@ -12,8 +12,8 @@ import {
 } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import SafeScreen from '@/components/SafeScreen';
+import { AlertProvider } from '@/components/AlertProvider';
 
-// Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout(): React.ReactElement | null {
@@ -37,9 +37,11 @@ export default function RootLayout(): React.ReactElement | null {
 
 	return (
 		<ClerkProvider tokenCache={tokenCache}>
-			<SafeScreen>
-				<Slot />
-			</SafeScreen>
+			<AlertProvider>
+				<SafeScreen>
+					<Slot />
+				</SafeScreen>
+			</AlertProvider>
 		</ClerkProvider>
 	);
 }

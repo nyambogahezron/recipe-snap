@@ -6,23 +6,24 @@ import {
 	TouchableOpacity,
 	FlatList,
 } from 'react-native';
-import { MealAPI } from '../../services/mealAPI';
-import { useDebounce } from '../../hooks/useDebounce';
-import { searchStyles } from '../../assets/styles/search.styles';
+import { MealAPI, TransformedMeal } from '@/services/mealAPI';
+import { useDebounce } from '@/hooks/useDebounce';
+import { searchStyles } from '@/assets/styles/search.styles';
 import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import RecipeCard from '../../components/RecipeCard';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import RecipeCard from '@/components/RecipeCard';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import SearchScreenSkeleton from '@/components/Skeletons/SearchScreenSkeleton';
 
 const SearchScreen = () => {
 	const [searchQuery, setSearchQuery] = useState('');
-	const [recipes, setRecipes] = useState([]);
+	const [recipes, setRecipes] = useState<TransformedMeal[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [initialLoading, setInitialLoading] = useState(true);
 
 	const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-	const performSearch = async (query) => {
+	const performSearch = async (query: string) => {
 		// if no search query
 		if (!query.trim()) {
 			const randomMeals = await MealAPI.getRandomMeals(12);
@@ -82,7 +83,7 @@ const SearchScreen = () => {
 		handleSearch();
 	}, [debouncedSearchQuery, initialLoading]);
 
-	if (initialLoading) return <LoadingSpinner message='Loading recipes...' />;
+	if (initialLoading) return <SearchScreenSkeleton />;
 
 	return (
 		<View style={searchStyles.container}>

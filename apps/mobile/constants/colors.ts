@@ -1,4 +1,3 @@
-
 export const COLORS = {
 	primary: '#301B3F',
 	background: '#FEF3E2',
@@ -8,4 +7,7 @@ export const COLORS = {
 	textLight: '#3C415C',
 	card: '#FFFFFF',
 	shadow: '#151515',
+	skeletonBase: '#E1E4E8',
+	skeletonHighlight: '#F6F8FA',
+	gray: '#808080',
 };

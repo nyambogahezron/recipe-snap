@@ -4,7 +4,6 @@ import {
 	Text,
 	TouchableOpacity,
 	Image,
-	Alert,
 	ScrollView,
 	ActivityIndicator,
 } from 'react-native';
@@ -12,6 +11,8 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import SafeScreen from '../../components/SafeScreen';
 import { aiService } from '../../services/ai/aiService';
+import { cacheService } from '../../services/cacheService';
+import { toast } from '../../services/toastService';
 import { aiStyles } from '../../assets/styles/ai.styles';
 import { COLORS } from '@/constants/colors';
 import {
@@ -37,10 +38,9 @@ export default function AIScreen() {
 	const requestCameraPermissions = async () => {
 		const { status } = await ImagePicker.requestCameraPermissionsAsync();
 		if (status !== 'granted') {
-			Alert.alert(
+			toast.warning(
 				'Permission Required',
-				'Camera permission is required to take photos. Please enable it in your device settings.',
-				[{ text: 'OK' }]
+				'Camera permission is required to take photos. Please enable it in your device settings.'
 			);
 			return false;
 		}
@@ -50,10 +50,9 @@ export default function AIScreen() {
 	const requestMediaLibraryPermissions = async () => {
 		const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 		if (status !== 'granted') {
-			Alert.alert(
+			toast.warning(
 				'Permission Required',
-				'Media library permission is required to select photos. Please enable it in your device settings.',
-				[{ text: 'OK' }]
+				'Media library permission is required to select photos. Please enable it in your device settings.'
 			);
 			return false;
 		}
@@ -79,7 +78,7 @@ export default function AIScreen() {
 			}
 		} catch (error) {
 			console.error('Error taking photo:', error);
-			Alert.alert('Error', 'Failed to take photo. Please try again.');
+			toast.error('Failed to take photo', 'Please try again.');
 		}
 	};
 
@@ -102,13 +101,13 @@ export default function AIScreen() {
 			}
 		} catch (error) {
 			console.error('Error picking image:', error);
-			Alert.alert('Error', 'Failed to select image. Please try again.');
+			toast.error('Failed to select image', 'Please try again.');
 		}
 	};
 
 	const processImage = async (feature: AIFeature) => {
 		if (!selectedImage) {
-			Alert.alert('No Image', 'Please select or take a photo first.');
+			toast.warning('No Image', 'Please select or take a photo first.');
 			return;
 		}
 
@@ -152,7 +151,7 @@ export default function AIScreen() {
 
 	const saveRecipe = async () => {
 		if (!results || !selectedImage || results.type !== 'generate-recipe') {
-			Alert.alert('Error', 'No recipe to save');
+			toast.error('No recipe to save', 'Please generate a recipe first');
 			return;
 		}
 
@@ -178,19 +177,20 @@ export default function AIScreen() {
 			});
 
 			if (saveResponse.success) {
-				Alert.alert(
-					'Success! 🎉',
-					'Recipe saved successfully! You can find it in your favorites.',
-					[{ text: 'OK' }]
+				toast.success(
+					'Recipe saved successfully! 🎉',
+					'You can find it in your favorites.'
 				);
+
+				// Invalidate AI recipes cache to force refresh
+				await cacheService.invalidateCache('AI_RECIPES', userId);
+				await cacheService.invalidateCache('FAVORITES', userId);
 			} else {
 				throw new Error(saveResponse.error || 'Failed to save recipe');
 			}
 		} catch (error) {
 			console.error('Error saving recipe:', error);
-			Alert.alert('Error', 'Failed to save recipe. Please try again.', [
-				{ text: 'OK' },
-			]);
+			toast.error('Failed to save recipe', 'Please try again later');
 		} finally {
 			setIsSaving(false);
 		}

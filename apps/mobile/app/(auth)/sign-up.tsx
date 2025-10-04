@@ -43,7 +43,7 @@ const SignUpScreen = () => {
 			await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
 
 			setPendingVerification(true);
-		} catch (err) {
+		} catch (err: any) {
 			Alert.alert(
 				'Error',
 				err.errors?.[0]?.message || 'Failed to create account'

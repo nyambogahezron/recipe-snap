@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-expo';
 import { API_URL } from '../../constants/api';
-import { MealAPI } from '../../services/mealAPI';
+import { MealAPI, TransformedMeal } from '../../services/mealAPI';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { Image } from 'expo-image';
 
@@ -14,11 +14,15 @@ import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
 
+interface RecipeWithVideo extends TransformedMeal {
+	youtubeUrl: string | null;
+}
+
 const RecipeDetailScreen = () => {
 	const { id: recipeId } = useLocalSearchParams();
 	const router = useRouter();
 
-	const [recipe, setRecipe] = useState(null);
+	const [recipe, setRecipe] = useState<RecipeWithVideo | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [isSaved, setIsSaved] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
@@ -32,7 +36,7 @@ const RecipeDetailScreen = () => {
 				const response = await fetch(`${API_URL}/favorites/${userId}`);
 				const favorites = await response.json();
 				const isRecipeSaved = favorites.some(
-					(fav) => fav.recipeId === parseInt(recipeId)
+					(fav: any) => fav.recipeId === parseInt(recipeId as string)
 				);
 				setIsSaved(isRecipeSaved);
 			} catch (error) {
@@ -43,16 +47,17 @@ const RecipeDetailScreen = () => {
 		const loadRecipeDetail = async () => {
 			setLoading(true);
 			try {
-				const mealData = await MealAPI.getMealById(recipeId);
+				const mealData = await MealAPI.getMealById(recipeId as string);
 				if (mealData) {
 					const transformedRecipe = MealAPI.transformMealData(mealData);
+					if (transformedRecipe) {
+						const recipeWithVideo: RecipeWithVideo = {
+							...transformedRecipe,
+							youtubeUrl: mealData.strYoutube || null,
+						};
 
-					const recipeWithVideo = {
-						...transformedRecipe,
-						youtubeUrl: mealData.strYoutube || null,
-					};
-
-					setRecipe(recipeWithVideo);
+						setRecipe(recipeWithVideo);
+					}
 				}
 			} catch (error) {
 				console.error('Error loading recipe detail:', error);
@@ -61,17 +66,21 @@ const RecipeDetailScreen = () => {
 			}
 		};
 
-		checkIfSaved();
+		if (userId) {
+			checkIfSaved();
+		}
 		loadRecipeDetail();
 	}, [recipeId, userId]);
 
-	const getYouTubeEmbedUrl = (url) => {
+	const getYouTubeEmbedUrl = (url: string) => {
 		// example url: https://www.youtube.com/watch?v=mTvlmY4vCug
 		const videoId = url.split('v=')[1];
 		return `https://www.youtube.com/embed/${videoId}`;
 	};
 
 	const handleToggleSave = async () => {
+		if (!recipe) return;
+
 		setIsSaving(true);
 
 		try {
@@ -95,7 +104,7 @@ const RecipeDetailScreen = () => {
 					},
 					body: JSON.stringify({
 						userId,
-						recipeId: parseInt(recipeId),
+						recipeId: parseInt(recipeId as string),
 						title: recipe.title,
 						image: recipe.image,
 						cookTime: recipe.cookTime,
@@ -115,6 +124,7 @@ const RecipeDetailScreen = () => {
 	};
 
 	if (loading) return <LoadingSpinner message='Loading recipe details...' />;
+	if (!recipe) return <Text>Recipe not found</Text>;
 
 	return (
 		<View style={recipeDetailStyles.container}>
@@ -257,7 +267,7 @@ const RecipeDetailScreen = () => {
 						</View>
 
 						<View style={recipeDetailStyles.ingredientsGrid}>
-							{recipe.ingredients.map((ingredient, index) => (
+							{recipe.ingredients.map((ingredient: string, index: number) => (
 								<View key={index} style={recipeDetailStyles.ingredientCard}>
 									<View style={recipeDetailStyles.ingredientNumber}>
 										<Text style={recipeDetailStyles.ingredientNumberText}>
@@ -297,7 +307,7 @@ const RecipeDetailScreen = () => {
 						</View>
 
 						<View style={recipeDetailStyles.instructionsContainer}>
-							{recipe.instructions.map((instruction, index) => (
+							{recipe.instructions.map((instruction: string, index: number) => (
 								<View key={index} style={recipeDetailStyles.instructionCard}>
 									<LinearGradient
 										colors={[COLORS.primary, COLORS.primary + 'CC']}

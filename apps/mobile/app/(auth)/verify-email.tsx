@@ -13,7 +13,12 @@ import {
 import { authStyles } from '../../assets/styles/auth.styles';
 import { Image } from 'expo-image';
 import { COLORS } from '@/constants/colors';
-const VerifyEmail = ({ email, onBack }) => {
+interface VerifyEmailProps {
+	email: string;
+	onBack: () => void;
+}
+
+const VerifyEmail = ({ email, onBack }: VerifyEmailProps) => {
 	const { isLoaded, signUp, setActive } = useSignUp();
 	const [code, setCode] = useState('');
 	const [loading, setLoading] = useState(false);
@@ -33,7 +38,7 @@ const VerifyEmail = ({ email, onBack }) => {
 				Alert.alert('Error', 'Verification failed. Please try again.');
 				console.error(JSON.stringify(signUpAttempt, null, 2));
 			}
-		} catch (err) {
+		} catch (err: any) {
 			Alert.alert('Error', err.errors?.[0]?.message || 'Verification failed');
 			console.error(JSON.stringify(err, null, 2));
 		} finally {

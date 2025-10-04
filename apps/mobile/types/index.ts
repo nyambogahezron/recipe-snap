@@ -82,7 +82,9 @@ export interface Recipe {
 	area: string;
 	ingredients: string[];
 	instructions: string[];
-	originalData: Meal;
+	originalData: Meal | any; // Allow any for AI recipes
+	isFavorite?: boolean;
+	source?: 'external' | 'ai';
 } // Component Props Types
 export interface CategoryData {
 	id: string;
@@ -92,6 +94,7 @@ export interface CategoryData {
 
 export interface RecipeCardProps {
 	recipe: Recipe;
+	onLongPress?: () => void;
 }
 
 export interface CategoryFilterProps {
