@@ -14,6 +14,11 @@ import * as SplashScreen from 'expo-splash-screen';
 import SafeScreen from '@/components/SafeScreen';
 import { AlertProvider } from '@/components/AlertProvider';
 
+SplashScreen.setOptions({
+	duration: 1000,
+	fade: true,
+});
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout(): React.ReactElement | null {
