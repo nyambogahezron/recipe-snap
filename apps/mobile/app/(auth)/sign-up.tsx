@@ -11,7 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useSignUp } from '@clerk/clerk-expo';
 import { useState } from 'react';
-import { authStyles } from '../../assets/styles/auth.styles';
+import { authStyles } from '@/assets/styles/auth.styles';
 import { Image } from 'expo-image';
 import { COLORS } from '@/constants/colors';
 
@@ -28,27 +28,65 @@ const SignUpScreen = () => {
 	const [pendingVerification, setPendingVerification] = useState(false);
 
 	const handleSignUp = async () => {
-		if (!email || !password)
-			return Alert.alert('Error', 'Please fill in all fields');
-		if (password.length < 6)
-			return Alert.alert('Error', 'Password must be at least 6 characters');
+		const trimmedEmail = email.trim().toLowerCase();
+		const trimmedPassword = password.trim();
 
-		if (!isLoaded) return;
+		if (!trimmedEmail || !trimmedPassword)
+			return Alert.alert('Error', 'Please fill in all fields');
+
+		// Basic email validation
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(trimmedEmail)) {
+			return Alert.alert('Error', 'Please enter a valid email address');
+		}
+
+		if (trimmedPassword.length < 8)
+			return Alert.alert(
+				'Error',
+				'Password must be at least 8 characters long'
+			);
+
+		if (!isLoaded || !signUp) {
+			return Alert.alert('Error', 'Sign up not available. Please try again.');
+		}
 
 		setLoading(true);
 
 		try {
-			await signUp.create({ emailAddress: email, password });
+			// Create the user
+			await signUp.create({
+				emailAddress: trimmedEmail,
+				password: trimmedPassword,
+			});
 
+			// Prepare email verification
 			await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
 
+			// Update email state with trimmed version
+			setEmail(trimmedEmail);
 			setPendingVerification(true);
 		} catch (err: any) {
-			Alert.alert(
-				'Error',
-				err.errors?.[0]?.message || 'Failed to create account'
-			);
-			console.error(JSON.stringify(err, null, 2));
+			// Handle specific error cases
+			if (err.errors?.[0]?.code === 'form_identifier_exists') {
+				Alert.alert(
+					'Error',
+					'This email is already registered. Please sign in instead.'
+				);
+			} else if (err.errors?.[0]?.code === 'form_password_pwned') {
+				Alert.alert(
+					'Error',
+					'This password has been found in a data breach. Please use a different password.'
+				);
+			} else if (err.errors?.[0]?.code === 'form_param_format_invalid') {
+				Alert.alert(
+					'Error',
+					'Invalid email format. Please check and try again.'
+				);
+			} else {
+				const errorMessage =
+					err.errors?.[0]?.message || 'Failed to create account';
+				Alert.alert('Error', errorMessage);
+			}
 		} finally {
 			setLoading(false);
 		}

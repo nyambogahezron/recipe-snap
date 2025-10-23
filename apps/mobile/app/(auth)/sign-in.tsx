@@ -29,30 +29,70 @@ const SignInScreen = () => {
 	const [loading, setLoading] = useState(false);
 
 	const handleSignIn = async () => {
-		if (!email || !password) {
+		const trimmedEmail = email.trim().toLowerCase();
+		const trimmedPassword = password.trim();
+
+		if (!trimmedEmail || !trimmedPassword) {
 			Alert.alert('Error', 'Please fill in all fields');
 			return;
 		}
 
-		if (!isLoaded) return;
+		// Basic email validation
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(trimmedEmail)) {
+			Alert.alert('Error', 'Please enter a valid email address');
+			return;
+		}
+
+		if (!isLoaded || !signIn) {
+			Alert.alert('Error', 'Sign in not available. Please try again.');
+			return;
+		}
 
 		setLoading(true);
 
 		try {
 			const signInAttempt = await signIn.create({
-				identifier: email,
-				password,
+				identifier: trimmedEmail,
+				password: trimmedPassword,
 			});
 
 			if (signInAttempt.status === 'complete') {
+				if (!signInAttempt.createdSessionId) {
+					Alert.alert(
+						'Error',
+						'Sign in completed but session creation failed. Please try again.'
+					);
+					return;
+				}
+
 				await setActive({ session: signInAttempt.createdSessionId });
+			} else if (signInAttempt.status === 'needs_first_factor') {
+				Alert.alert(
+					'Error',
+					'Additional verification required. Please check your email.'
+				);
 			} else {
 				Alert.alert('Error', 'Sign in failed. Please try again.');
-				console.error(JSON.stringify(signInAttempt, null, 2));
 			}
 		} catch (err: any) {
-			Alert.alert('Error', err?.errors?.[0]?.message || 'Sign in failed');
-			console.error(JSON.stringify(err, null, 2));
+			// Handle specific error cases
+			if (err.errors?.[0]?.code === 'form_identifier_not_found') {
+				Alert.alert(
+					'Error',
+					'Account not found. Please check your email or sign up.'
+				);
+			} else if (err.errors?.[0]?.code === 'form_password_incorrect') {
+				Alert.alert('Error', 'Incorrect password. Please try again.');
+			} else if (err.errors?.[0]?.code === 'user_locked') {
+				Alert.alert(
+					'Error',
+					'Your account has been locked. Please contact support.'
+				);
+			} else {
+				const errorMessage = err?.errors?.[0]?.message || 'Sign in failed';
+				Alert.alert('Error', errorMessage);
+			}
 		} finally {
 			setLoading(false);
 		}
