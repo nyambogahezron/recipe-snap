@@ -9,55 +9,77 @@ import {
 	TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSignUp } from '@clerk/clerk-expo';
+import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
-import { authStyles } from '../../assets/styles/auth.styles';
+import { authStyles } from '@/assets/styles/auth.styles';
 import { Image } from 'expo-image';
 import { COLORS } from '@/constants/colors';
-
 import { Ionicons } from '@expo/vector-icons';
-import VerifyEmail from './verify-email';
 
 const SignUpScreen = () => {
 	const router = useRouter();
-	const { isLoaded, signUp } = useSignUp();
+	const { signUp } = useAuth();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [name, setName] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [pendingVerification, setPendingVerification] = useState(false);
 
 	const handleSignUp = async () => {
-		if (!email || !password)
-			return Alert.alert('Error', 'Please fill in all fields');
-		if (password.length < 6)
-			return Alert.alert('Error', 'Password must be at least 6 characters');
+		const trimmedEmail = email.trim().toLowerCase();
+		const trimmedPassword = password.trim();
+		const trimmedName = name.trim();
 
-		if (!isLoaded) return;
+		if (!trimmedEmail || !trimmedPassword) {
+			return Alert.alert('Error', 'Please fill in all required fields');
+		}
+
+		// Basic email validation
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(trimmedEmail)) {
+			return Alert.alert('Error', 'Please enter a valid email address');
+		}
+
+		if (trimmedPassword.length < 6) {
+			return Alert.alert(
+				'Error',
+				'Password must be at least 6 characters long'
+			);
+		}
 
 		setLoading(true);
 
 		try {
-			await signUp.create({ emailAddress: email, password });
+			const result = await signUp(
+				trimmedEmail,
+				trimmedPassword,
+				trimmedName || undefined
+			);
 
-			await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-
-			setPendingVerification(true);
-		} catch (err: any) {
+			if (result.success) {
+				Alert.alert(
+					'Success',
+					'Account created successfully! You are now signed in.',
+					[
+						{
+							text: 'OK',
+							onPress: () => router.replace('/(tabs)'),
+						},
+					]
+				);
+			} else {
+				Alert.alert('Error', result.error || 'Failed to create account');
+			}
+		} catch (error) {
+			console.error('Sign up error:', error);
 			Alert.alert(
 				'Error',
-				err.errors?.[0]?.message || 'Failed to create account'
+				error instanceof Error ? error.message : 'Failed to create account'
 			);
-			console.error(JSON.stringify(err, null, 2));
 		} finally {
 			setLoading(false);
 		}
 	};
-
-	if (pendingVerification)
-		return (
-			<VerifyEmail email={email} onBack={() => setPendingVerification(false)} />
-		);
 
 	return (
 		<View style={authStyles.container}>
@@ -82,6 +104,18 @@ const SignUpScreen = () => {
 					<Text style={authStyles.title}>Create Account</Text>
 
 					<View style={authStyles.formContainer}>
+						{/* Name Input (Optional) */}
+						<View style={authStyles.inputContainer}>
+							<TextInput
+								style={authStyles.textInput}
+								placeholder='Enter your name (optional)'
+								placeholderTextColor={COLORS.textLight}
+								value={name}
+								onChangeText={setName}
+								autoCapitalize='words'
+							/>
+						</View>
+
 						{/* Email Input */}
 						<View style={authStyles.inputContainer}>
 							<TextInput

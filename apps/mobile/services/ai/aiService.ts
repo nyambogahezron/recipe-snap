@@ -7,108 +7,94 @@ import {
 	SaveAIRecipeOutput,
 	AIServiceResponse,
 } from '../../types/ai';
-import { API_URL } from '../../constants/api';
+import { aiRecipesService } from '../../database/services';
+import {
+	identifyDishFromImage as aiIdentifyDish,
+	generateRecipeFromImage as aiGenerateRecipe,
+	isAIAvailable,
+} from '../../lib/ai';
 
 /**
  * AI Service for Recipe Snap Mobile App
- * This service communicates with the web backend AI endpoints
+ * This service handles AI recipe generation using Google Gemini AI and local storage
+ *
+ * Features:
+ * - Dish identification from images
+ * - Recipe generation from images
+ * - Local recipe storage with SQLite
+ * - Offline fallback with mock data
+ *
+ * Setup:
+ * 1. Get API key from https://aistudio.google.com/app/apikey
+ * 2. Add EXPO_PUBLIC_GOOGLE_GENAI_API_KEY to .env
+ * 3. Restart Expo dev server
  */
 
 class AIService {
-	private apiUrl: string;
-
-	constructor() {
-		this.apiUrl = API_URL;
-	}
-
 	/**
-	 * Identifies a dish from an image
-	 * @param input - Image data URI and options
+	 * Identifies a dish from an image using Google Gemini AI
+	 * @param input - Image data URI
 	 * @returns Promise with dish identification results
 	 */
 	async identifyDishFromImage(
 		input: IdentifyDishFromImageInput
 	): Promise<AIServiceResponse<IdentifyDishFromImageOutput>> {
 		try {
-			const response = await fetch(`${this.apiUrl}/ai/identify-dish`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(input),
+			const result = await aiIdentifyDish({
+				photoDataUri: input.photoDataUri,
 			});
-
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const apiResponse: {
-				success: boolean;
-				data?: IdentifyDishFromImageOutput;
-				error?: string;
-			} = await response.json();
-
-			if (!apiResponse.success || !apiResponse.data) {
-				throw new Error(apiResponse.error || 'Failed to identify dish');
-			}
 
 			return {
 				success: true,
-				data: apiResponse.data,
+				data: result,
 			};
 		} catch (error) {
 			console.error('Error identifying dish:', error);
 			return {
 				success: false,
 				error:
-					error instanceof Error ? error.message : 'Unknown error occurred',
+					error instanceof Error
+						? error.message
+						: 'Failed to identify dish from image',
 			};
 		}
 	}
 
 	/**
-	 * Generates a recipe from an image of ingredients or dish
-	 * @param input - Image data URI and options
+	 * Generates a recipe from an image using Google Gemini AI
+	 * @param input - Image data URI
 	 * @returns Promise with generated recipe
 	 */
 	async generateRecipeFromImage(
 		input: GenerateRecipeFromImageInput
 	): Promise<AIServiceResponse<GenerateRecipeFromImageOutput>> {
 		try {
-			const response = await fetch(`${this.apiUrl}/ai/generate-recipe`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(input),
+			const result = await aiGenerateRecipe({
+				photoDataUri: input.photoDataUri,
 			});
-
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const apiResponse: {
-				success: boolean;
-				data?: GenerateRecipeFromImageOutput;
-				error?: string;
-			} = await response.json();
-
-			if (!apiResponse.success || !apiResponse.data) {
-				throw new Error(apiResponse.error || 'Failed to generate recipe');
-			}
 
 			return {
 				success: true,
-				data: apiResponse.data,
+				data: result,
 			};
 		} catch (error) {
 			console.error('Error generating recipe:', error);
 			return {
 				success: false,
 				error:
-					error instanceof Error ? error.message : 'Unknown error occurred',
+					error instanceof Error
+						? error.message
+						: 'Failed to generate recipe from image',
 			};
 		}
+	}
+
+	/**
+	 * Check if AI features are available
+	 * @returns Boolean indicating if Google AI is configured
+	 */
+	isAIConfigured(): boolean {
+		return isAIAvailable();
 	}
 
 	/**
@@ -137,7 +123,7 @@ class AIService {
 	}
 
 	/**
-	 * Saves an AI-generated recipe to the backend
+	 * Saves an AI-generated recipe to local database
 	 * @param input - Recipe data and image to save
 	 * @returns Promise with saved recipe data
 	 */
@@ -145,31 +131,29 @@ class AIService {
 		input: SaveAIRecipeInput
 	): Promise<AIServiceResponse<SaveAIRecipeOutput>> {
 		try {
-			const response = await fetch(`${this.apiUrl}/ai/save-recipe`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(input),
+			// Save to local database
+			const savedRecipe = await aiRecipesService.saveAIRecipe({
+				userId: input.userId,
+				recipeName: input.recipeName,
+				ingredients: input.ingredients,
+				instructions: input.instructions,
+				imageData: input.imageData,
+				imageMimeType: input.imageMimeType,
 			});
-
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const apiResponse: {
-				success: boolean;
-				data?: SaveAIRecipeOutput;
-				error?: string;
-			} = await response.json();
-
-			if (!apiResponse.success || !apiResponse.data) {
-				throw new Error(apiResponse.error || 'Failed to save recipe');
-			}
 
 			return {
 				success: true,
-				data: apiResponse.data,
+				data: {
+					id: savedRecipe.id,
+					userId: savedRecipe.userId,
+					recipeName: savedRecipe.recipeName,
+					ingredients: savedRecipe.ingredients as any,
+					instructions: savedRecipe.instructions as any,
+					imageData: savedRecipe.imageData || '',
+					imageMimeType: savedRecipe.imageMimeType || '',
+					createdAt: savedRecipe.createdAt,
+					updatedAt: savedRecipe.updatedAt,
+				},
 			};
 		} catch (error) {
 			console.error('Error saving AI recipe:', error);
@@ -182,7 +166,7 @@ class AIService {
 	}
 
 	/**
-	 * Gets all AI recipes for a user
+	 * Gets all AI recipes for a user from local database
 	 * @param userId - User ID to fetch recipes for
 	 * @returns Promise with user's AI recipes
 	 */
@@ -190,30 +174,23 @@ class AIService {
 		userId: string
 	): Promise<AIServiceResponse<SaveAIRecipeOutput[]>> {
 		try {
-			const response = await fetch(`${this.apiUrl}/ai/recipes/${userId}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
+			const recipes = await aiRecipesService.getUserAIRecipes(userId);
 
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const apiResponse: {
-				success: boolean;
-				data?: SaveAIRecipeOutput[];
-				error?: string;
-			} = await response.json();
-
-			if (!apiResponse.success || !apiResponse.data) {
-				throw new Error(apiResponse.error || 'Failed to fetch recipes');
-			}
+			const formattedRecipes: SaveAIRecipeOutput[] = recipes.map((recipe) => ({
+				id: recipe.id,
+				userId: recipe.userId,
+				recipeName: recipe.recipeName,
+				ingredients: recipe.ingredients as any,
+				instructions: recipe.instructions as any,
+				imageData: recipe.imageData || '',
+				imageMimeType: recipe.imageMimeType || '',
+				createdAt: recipe.createdAt,
+				updatedAt: recipe.updatedAt,
+			}));
 
 			return {
 				success: true,
-				data: apiResponse.data,
+				data: formattedRecipes,
 			};
 		} catch (error) {
 			console.error('Error fetching AI recipes:', error);
@@ -226,7 +203,7 @@ class AIService {
 	}
 
 	/**
-	 * Deletes an AI recipe
+	 * Deletes an AI recipe from local database
 	 * @param userId - User ID who owns the recipe
 	 * @param recipeId - ID of the recipe to delete
 	 * @returns Promise with deletion result
@@ -236,33 +213,11 @@ class AIService {
 		recipeId: number
 	): Promise<AIServiceResponse<{ message: string }>> {
 		try {
-			const response = await fetch(
-				`${this.apiUrl}/ai/recipes/${userId}/${recipeId}`,
-				{
-					method: 'DELETE',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				}
-			);
-
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const apiResponse: {
-				success: boolean;
-				data?: { message: string };
-				error?: string;
-			} = await response.json();
-
-			if (!apiResponse.success || !apiResponse.data) {
-				throw new Error(apiResponse.error || 'Failed to delete recipe');
-			}
+			await aiRecipesService.deleteAIRecipe(userId, recipeId);
 
 			return {
 				success: true,
-				data: apiResponse.data,
+				data: { message: 'Recipe deleted successfully' },
 			};
 		} catch (error) {
 			console.error('Error deleting AI recipe:', error);

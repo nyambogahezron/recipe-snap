@@ -1,16 +1,14 @@
 import { View, Text, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { useUser } from '@clerk/clerk-expo';
-import { API_URL } from '../../constants/api';
-import { MealAPI, TransformedMeal } from '../../services/mealAPI';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { useAuth } from '@/contexts/AuthContext';
+import { favoritesService } from '@/database/services';
+import { MealAPI, TransformedMeal } from '@/services/mealAPI';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { Image } from 'expo-image';
-
-import { recipeDetailStyles } from '../../assets/styles/recipe-detail.styles';
+import { recipeDetailStyles } from '@/assets/styles/recipe-detail.styles';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '@/constants/colors';
-
 import { Ionicons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
 
@@ -27,18 +25,18 @@ const RecipeDetailScreen = () => {
 	const [isSaved, setIsSaved] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 
-	const { user } = useUser();
+	const { user } = useAuth();
 	const userId = user?.id;
 
 	useEffect(() => {
 		const checkIfSaved = async () => {
 			try {
-				const response = await fetch(`${API_URL}/favorites/${userId}`);
-				const favorites = await response.json();
-				const isRecipeSaved = favorites.some(
-					(fav: any) => fav.recipeId === parseInt(recipeId as string)
+				if (!userId) return;
+				const isFavorite = await favoritesService.isFavorite(
+					userId,
+					recipeId as string
 				);
-				setIsSaved(isRecipeSaved);
+				setIsSaved(isFavorite);
 			} catch (error) {
 				console.error('Error checking if recipe is saved:', error);
 			}
@@ -79,40 +77,28 @@ const RecipeDetailScreen = () => {
 	};
 
 	const handleToggleSave = async () => {
-		if (!recipe) return;
+		if (!recipe || !userId) return;
 
 		setIsSaving(true);
 
 		try {
 			if (isSaved) {
 				// remove from favorites
-				const response = await fetch(
-					`${API_URL}/favorites/${userId}/${recipeId}`,
-					{
-						method: 'DELETE',
-					}
-				);
-				if (!response.ok) throw new Error('Failed to remove recipe');
-
+				await favoritesService.removeFavorite(userId, recipeId as string);
 				setIsSaved(false);
 			} else {
 				// add to favorites
-				const response = await fetch(`${API_URL}/favorites`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						userId,
-						recipeId: parseInt(recipeId as string),
-						title: recipe.title,
-						image: recipe.image,
-						cookTime: recipe.cookTime,
-						servings: recipe.servings,
-					}),
+				await favoritesService.addFavorite({
+					userId,
+					recipeId: recipeId as string,
+					title: recipe.title,
+					image: recipe.image,
+					cookTime: recipe.cookTime,
+					servings: recipe.servings.toString(),
+					category: recipe.category,
+					area: recipe.area,
+					description: recipe.description,
 				});
-
-				if (!response.ok) throw new Error('Failed to save recipe');
 				setIsSaved(true);
 			}
 		} catch (error) {

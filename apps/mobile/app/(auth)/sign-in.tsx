@@ -1,4 +1,4 @@
-import { useSignIn } from '@clerk/clerk-expo';
+import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -12,16 +12,13 @@ import {
 	TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
 import { Image } from 'expo-image';
-
 import { authStyles } from '../../assets/styles/auth.styles';
 import { COLORS } from '@/constants/colors';
 
 const SignInScreen = () => {
 	const router = useRouter();
-
-	const { signIn, setActive, isLoaded } = useSignIn();
+	const { signIn } = useAuth();
 
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -29,30 +26,37 @@ const SignInScreen = () => {
 	const [loading, setLoading] = useState(false);
 
 	const handleSignIn = async () => {
-		if (!email || !password) {
+		const trimmedEmail = email.trim().toLowerCase();
+		const trimmedPassword = password.trim();
+
+		if (!trimmedEmail || !trimmedPassword) {
 			Alert.alert('Error', 'Please fill in all fields');
 			return;
 		}
 
-		if (!isLoaded) return;
+		// Basic email validation
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(trimmedEmail)) {
+			Alert.alert('Error', 'Please enter a valid email address');
+			return;
+		}
 
 		setLoading(true);
 
 		try {
-			const signInAttempt = await signIn.create({
-				identifier: email,
-				password,
-			});
+			const result = await signIn(trimmedEmail, trimmedPassword);
 
-			if (signInAttempt.status === 'complete') {
-				await setActive({ session: signInAttempt.createdSessionId });
+			if (result.success) {
+				router.replace('/(tabs)');
 			} else {
-				Alert.alert('Error', 'Sign in failed. Please try again.');
-				console.error(JSON.stringify(signInAttempt, null, 2));
+				Alert.alert('Error', result.error || 'Sign in failed');
 			}
-		} catch (err: any) {
-			Alert.alert('Error', err?.errors?.[0]?.message || 'Sign in failed');
-			console.error(JSON.stringify(err, null, 2));
+		} catch (error) {
+			console.error('Sign in error:', error);
+			Alert.alert(
+				'Error',
+				error instanceof Error ? error.message : 'Sign in failed'
+			);
 		} finally {
 			setLoading(false);
 		}

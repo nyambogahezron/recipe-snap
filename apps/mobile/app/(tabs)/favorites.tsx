@@ -6,10 +6,10 @@ import {
 	FlatList,
 	RefreshControl,
 } from 'react-native';
-import { useClerk, useUser } from '@clerk/clerk-expo';
+import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState, useCallback } from 'react';
-import { API_URL } from '@/constants/api';
 import { aiService } from '@/services/ai/aiService';
+import { favoritesService } from '@/database/services';
 import { cacheService } from '@/services/cacheService';
 import { toast } from '@/services/toastService';
 import { favoritesStyles } from '@/assets/styles/favorites.styles';
@@ -21,8 +21,7 @@ import RecipeListSkeleton from '@/components/Skeletons/RecipeListSkeleton';
 import { Recipe } from '@/types';
 
 const FavoritesScreen = () => {
-	const { signOut } = useClerk();
-	const { user } = useUser();
+	const { signOut, user } = useAuth();
 	const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
@@ -48,33 +47,26 @@ const FavoritesScreen = () => {
 					}
 				}
 
-				// Load regular favorites
-				const favoritesResponse = await fetch(
-					`${API_URL}/favorites/${user.id}`
-				);
-				let regularFavorites: Recipe[] = [];
+				// Load regular favorites from local database
+				const favoritesData = await favoritesService.getUserFavorites(user.id);
+				const regularFavorites: Recipe[] = favoritesData.map((favorite) => ({
+					id: favorite.recipeId,
+					title: favorite.title,
+					description: favorite.description || 'Saved recipe',
+					image: favorite.image || '',
+					cookTime: favorite.cookTime || 'Unknown',
+					servings: parseInt(favorite.servings || '1') || 1,
+					category: favorite.category || 'Favorite',
+					area: favorite.area || 'Unknown',
+					ingredients: [],
+					instructions: [],
+					originalData: {} as any,
+					isFavorite: true,
+					source: 'external' as const,
+				}));
+				setRegularFavoritesCount(regularFavorites.length);
 
-				if (favoritesResponse.ok) {
-					const favorites = await favoritesResponse.json();
-					regularFavorites = favorites.map((favorite: any) => ({
-						id: favorite.recipeId.toString(),
-						title: favorite.title,
-						description: 'External recipe favorite',
-						image: favorite.image || '',
-						cookTime: favorite.cookTime || 'Unknown',
-						servings: parseInt(favorite.servings) || 1,
-						category: 'Favorite',
-						area: 'Unknown',
-						ingredients: [],
-						instructions: [],
-						originalData: {} as any,
-						isFavorite: true,
-						source: 'external' as const,
-					}));
-					setRegularFavoritesCount(regularFavorites.length);
-				}
-
-				// Load AI recipes
+				// Load AI recipes from local database
 				const aiRecipesResponse = await aiService.getUserAIRecipes(user.id);
 				let aiRecipes: Recipe[] = [];
 
@@ -83,7 +75,9 @@ const FavoritesScreen = () => {
 						id: `ai_${recipe.id}`,
 						title: recipe.recipeName,
 						description: 'AI-generated recipe',
-						image: `data:${recipe.imageMimeType};base64,${recipe.imageData}`,
+						image: recipe.imageData
+							? `data:${recipe.imageMimeType};base64,${recipe.imageData}`
+							: '',
 						cookTime: 'Varies',
 						servings: 1,
 						category: 'AI Recipe',
@@ -132,7 +126,7 @@ const FavoritesScreen = () => {
 
 			try {
 				if (recipe.source === 'ai') {
-					// Remove AI recipe
+					// Remove AI recipe from local database
 					const recipeId =
 						recipe.originalData?.id || parseInt(recipe.id.replace('ai_', ''));
 					const response = await aiService.deleteAIRecipe(user.id, recipeId);
@@ -146,16 +140,8 @@ const FavoritesScreen = () => {
 						throw new Error(response.error || 'Failed to delete AI recipe');
 					}
 				} else {
-					// Remove external favorite
-					const response = await fetch(
-						`${API_URL}/favorites/${user.id}/${recipe.id}`,
-						{ method: 'DELETE' }
-					);
-
-					if (!response.ok) {
-						throw new Error('Failed to remove from favorites');
-					}
-
+					// Remove external favorite from local database
+					await favoritesService.removeFavorite(user.id, recipe.id);
 					toast.success(
 						'Removed from favorites',
 						'Recipe has been removed from your favorites'

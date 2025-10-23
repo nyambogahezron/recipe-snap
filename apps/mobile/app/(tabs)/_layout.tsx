@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from '@clerk/clerk-expo';
+import { useAuth } from '@/contexts/AuthContext';
 import { Redirect, Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
@@ -7,10 +7,10 @@ import { FONTS } from '@/constants/fonts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TabsLayout = (): React.ReactElement | null => {
-	const { isSignedIn, isLoaded } = useAuth();
+	const { isSignedIn, isLoading } = useAuth();
 	const insets = useSafeAreaInsets();
 
-	if (!isLoaded) return null;
+	if (isLoading) return null;
 
 	if (!isSignedIn) return <Redirect href={'/(auth)/sign-in'} />;
 
