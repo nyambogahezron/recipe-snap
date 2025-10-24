@@ -53,8 +53,20 @@ export default function RootLayout(): React.ReactElement | null {
 		return null;
 	}
 
+	const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+
+	if (!publishableKey) {
+		throw new Error(
+			'Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env'
+		);
+	}
+
 	return (
+<<<<<<< HEAD
 		<AuthProvider>
+=======
+		<ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
+>>>>>>> ed0db2850a1450709bd60b5d55f1be4289a71c22
 			<AlertProvider>
 				<SafeScreen>
 					<Slot />

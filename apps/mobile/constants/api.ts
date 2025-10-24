@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * API URL Configuration
  *
@@ -13,3 +14,6 @@
 
 // This is kept for reference only - not actively used
 export const API_URL: string = 'http://localhost:5000/api';
+=======
+export const API_URL: string = 'http://192.168.2.11:5000/api';
+>>>>>>> ed0db2850a1450709bd60b5d55f1be4289a71c22
