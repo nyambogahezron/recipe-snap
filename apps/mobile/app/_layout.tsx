@@ -62,11 +62,7 @@ export default function RootLayout(): React.ReactElement | null {
 	}
 
 	return (
-<<<<<<< HEAD
 		<AuthProvider>
-=======
-		<ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
->>>>>>> ed0db2850a1450709bd60b5d55f1be4289a71c22
 			<AlertProvider>
 				<SafeScreen>
 					<Slot />

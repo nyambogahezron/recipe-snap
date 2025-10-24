@@ -28,17 +28,11 @@ const SignUpScreen = () => {
 	const handleSignUp = async () => {
 		const trimmedEmail = email.trim().toLowerCase();
 		const trimmedPassword = password.trim();
-<<<<<<< HEAD
 		const trimmedName = name.trim();
 
 		if (!trimmedEmail || !trimmedPassword) {
 			return Alert.alert('Error', 'Please fill in all required fields');
 		}
-=======
-
-		if (!trimmedEmail || !trimmedPassword)
-			return Alert.alert('Error', 'Please fill in all fields');
->>>>>>> ed0db2850a1450709bd60b5d55f1be4289a71c22
 
 		// Basic email validation
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -46,28 +40,16 @@ const SignUpScreen = () => {
 			return Alert.alert('Error', 'Please enter a valid email address');
 		}
 
-<<<<<<< HEAD
 		if (trimmedPassword.length < 6) {
 			return Alert.alert(
 				'Error',
 				'Password must be at least 6 characters long'
 			);
-=======
-		if (trimmedPassword.length < 8)
-			return Alert.alert(
-				'Error',
-				'Password must be at least 8 characters long'
-			);
-
-		if (!isLoaded || !signUp) {
-			return Alert.alert('Error', 'Sign up not available. Please try again.');
->>>>>>> ed0db2850a1450709bd60b5d55f1be4289a71c22
 		}
 
 		setLoading(true);
 
 		try {
-<<<<<<< HEAD
 			const result = await signUp(
 				trimmedEmail,
 				trimmedPassword,
@@ -94,42 +76,6 @@ const SignUpScreen = () => {
 				'Error',
 				error instanceof Error ? error.message : 'Failed to create account'
 			);
-=======
-			// Create the user
-			await signUp.create({
-				emailAddress: trimmedEmail,
-				password: trimmedPassword,
-			});
-
-			// Prepare email verification
-			await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-
-			// Update email state with trimmed version
-			setEmail(trimmedEmail);
-			setPendingVerification(true);
-		} catch (err: any) {
-			// Handle specific error cases
-			if (err.errors?.[0]?.code === 'form_identifier_exists') {
-				Alert.alert(
-					'Error',
-					'This email is already registered. Please sign in instead.'
-				);
-			} else if (err.errors?.[0]?.code === 'form_password_pwned') {
-				Alert.alert(
-					'Error',
-					'This password has been found in a data breach. Please use a different password.'
-				);
-			} else if (err.errors?.[0]?.code === 'form_param_format_invalid') {
-				Alert.alert(
-					'Error',
-					'Invalid email format. Please check and try again.'
-				);
-			} else {
-				const errorMessage =
-					err.errors?.[0]?.message || 'Failed to create account';
-				Alert.alert('Error', errorMessage);
-			}
->>>>>>> ed0db2850a1450709bd60b5d55f1be4289a71c22
 		} finally {
 			setLoading(false);
 		}

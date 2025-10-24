@@ -1,13 +1,8 @@
 import { View, Text, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-<<<<<<< HEAD
 import { useAuth } from '@/contexts/AuthContext';
 import { favoritesService } from '@/database/services';
-=======
-import { useUser } from '@clerk/clerk-expo';
-import { API_URL } from '@/constants/api';
->>>>>>> ed0db2850a1450709bd60b5d55f1be4289a71c22
 import { MealAPI, TransformedMeal } from '@/services/mealAPI';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { Image } from 'expo-image';
