@@ -1,6 +1,8 @@
-import React from 'react';
-import { Slot } from 'expo-router';
-import { useFonts } from 'expo-font';
+import { AlertProvider } from '@/components/AlertProvider';
+import SafeScreen from '@/components/SafeScreen';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { db } from '@/database';
+import migrations from '@/database/drizzle/migrations';
 import {
 	Inter_400Regular,
 	Inter_500Medium,
@@ -8,66 +10,66 @@ import {
 	Inter_700Bold,
 	Inter_800ExtraBold,
 } from '@expo-google-fonts/inter';
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
+import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
+import * as Fonts from 'expo-font';
+import { Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import SafeScreen from '@/components/SafeScreen';
-import { AlertProvider } from '@/components/AlertProvider';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { initializeDatabase } from '@/database';
+import React from 'react';
+import { View } from 'react-native';
+
+SplashScreen.preventAutoHideAsync();
 
 SplashScreen.setOptions({
 	duration: 1000,
 	fade: true,
 });
 
-SplashScreen.preventAutoHideAsync();
-
 export default function RootLayout(): React.ReactElement | null {
-	const [fontsLoaded] = useFonts({
-		Inter_400Regular,
-		Inter_500Medium,
-		Inter_600SemiBold,
-		Inter_700Bold,
-		Inter_800ExtraBold,
-	});
+	const { error } = useMigrations(db, migrations);
+	const [appIsReady, setAppIsReady] = React.useState(false);
+
+	if (error) {
+		console.error('Migration error:', error);
+	}
+
+	useDrizzleStudio(db.$client);
 
 	React.useEffect(() => {
-		if (fontsLoaded) {
-			SplashScreen.hideAsync();
-		}
-	}, [fontsLoaded]);
-
-	// Initialize the local database
-	React.useEffect(() => {
-		const setupDatabase = async () => {
+		async function prepare() {
 			try {
-				await initializeDatabase();
-				console.log('✅ Database ready');
-			} catch (error) {
-				console.error('❌ Failed to initialize database:', error);
+				await Fonts.loadAsync({
+					Inter_400Regular,
+					Inter_500Medium,
+					Inter_600SemiBold,
+					Inter_700Bold,
+					Inter_800ExtraBold,
+				});
+			} catch (e) {
+				console.warn('Error loading fonts:', e);
+			} finally {
+				setAppIsReady(true);
 			}
-		};
-		setupDatabase();
+		}
+
+		prepare();
 	}, []);
 
-	if (!fontsLoaded) {
-		return null;
-	}
-
-	const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
-
-	if (!publishableKey) {
-		throw new Error(
-			'Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env'
-		);
-	}
+	const onLayoutRootView = React.useCallback(async () => {
+		if (appIsReady) {
+			await SplashScreen.hideAsync();
+		}
+	}, [appIsReady]);
 
 	return (
-		<AuthProvider>
-			<AlertProvider>
-				<SafeScreen>
-					<Slot />
-				</SafeScreen>
-			</AlertProvider>
-		</AuthProvider>
+		<View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+			<AuthProvider>
+				<AlertProvider>
+					<SafeScreen>
+						<Slot />
+					</SafeScreen>
+				</AlertProvider>
+			</AuthProvider>
+		</View>
 	);
 }
