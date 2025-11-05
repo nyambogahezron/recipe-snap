@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { getModel, isAIAvailable } from '../ai-instance';
+import { ai, isAIAvailable } from '../ai-instance';
 
 const IdentifyDishFromImageInputSchema = z.object({
 	photoDataUri: z
@@ -25,24 +25,7 @@ export type IdentifyDishFromImageOutput = z.infer<
 >;
 
 /**
- * Extract base64 data and mime type from data URI
- */
-function parseDataUri(dataUri: string): {
-	mimeType: string;
-	base64Data: string;
-} {
-	const matches = dataUri.match(/^data:(.+?);base64,(.+)$/);
-	if (!matches) {
-		throw new Error('Invalid data URI format');
-	}
-	return {
-		mimeType: matches[1],
-		base64Data: matches[2],
-	};
-}
-
-/**
- * Identifies a dish from an image using Google Gemini AI
+ * Identifies a dish from an image using Google Gemini AI via Genkit
  */
 export async function identifyDishFromImage(
 	input: IdentifyDishFromImageInput
@@ -76,12 +59,6 @@ export async function identifyDishFromImage(
 	}
 
 	try {
-		// Parse data URI
-		const { mimeType, base64Data } = parseDataUri(validatedInput.photoDataUri);
-
-		// Get AI model
-		const model = getModel();
-
 		// Create prompt
 		const prompt = `You are an expert food identifier. Analyze this image of a dish and identify it.
 
@@ -94,19 +71,13 @@ Your response MUST be a valid JSON object with this exact structure:
 The confidence should be a number between 0 and 1 representing how confident you are in the identification.
 Only respond with the JSON object, no other text.`;
 
-		// Generate content with image
-		const result = await model.generateContent([
-			prompt,
-			{
-				inlineData: {
-					data: base64Data,
-					mimeType: mimeType,
-				},
-			},
+		// Generate content with image using Genkit
+		const result = await ai.generate([
+			{ text: prompt },
+			{ media: { url: validatedInput.photoDataUri } },
 		]);
 
-		const response = result.response;
-		const text = response.text();
+		const text = result.text;
 
 		// Parse JSON response
 		const jsonMatch = text.match(/\{[\s\S]*\}/);

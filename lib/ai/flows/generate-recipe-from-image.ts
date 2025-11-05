@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { getModel, isAIAvailable } from '../ai-instance';
+import { ai, isAIAvailable } from '../ai-instance';
 
 const GenerateRecipeFromImageInputSchema = z.object({
 	photoDataUri: z
@@ -28,24 +28,7 @@ export type GenerateRecipeFromImageOutput = z.infer<
 >;
 
 /**
- * Extract base64 data and mime type from data URI
- */
-function parseDataUri(dataUri: string): {
-	mimeType: string;
-	base64Data: string;
-} {
-	const matches = dataUri.match(/^data:(.+?);base64,(.+)$/);
-	if (!matches) {
-		throw new Error('Invalid data URI format');
-	}
-	return {
-		mimeType: matches[1],
-		base64Data: matches[2],
-	};
-}
-
-/**
- * Generates a recipe from an image using Google Gemini AI
+ * Generates a recipe from an image using Google Gemini AI via Genkit
  */
 export async function generateRecipeFromImage(
 	input: GenerateRecipeFromImageInput
@@ -107,12 +90,6 @@ export async function generateRecipeFromImage(
 	}
 
 	try {
-		// Parse data URI
-		const { mimeType, base64Data } = parseDataUri(validatedInput.photoDataUri);
-
-		// Get AI model
-		const model = getModel();
-
 		// Create prompt
 		const prompt = `You are an expert chef and recipe creator. Analyze this image of ingredients or a dish and create a complete recipe.
 
@@ -140,19 +117,13 @@ Requirements:
 
 Only respond with the JSON object, no other text.`;
 
-		// Generate content with image
-		const result = await model.generateContent([
-			prompt,
-			{
-				inlineData: {
-					data: base64Data,
-					mimeType: mimeType,
-				},
-			},
+		// Generate content with image using Genkit
+		const result = await ai.generate([
+			{ text: prompt },
+			{ media: { url: validatedInput.photoDataUri } },
 		]);
 
-		const response = result.response;
-		const text = response.text();
+		const text = result.text;
 
 		// Parse JSON response
 		const jsonMatch = text.match(/\{[\s\S]*\}/);

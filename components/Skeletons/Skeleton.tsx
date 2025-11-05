@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, } from 'react';
-import { Animated,} from 'react-native';
 import { COLORS } from '@/constants/colors';
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleProp, ViewProps, ViewStyle } from 'react-native';
 
 interface SkeletonProps {
 	width?: number | string;
 	height?: number;
 	borderRadius?: number;
-	style?: any;
+	style?: StyleProp<ViewStyle>;
 }
 
 const Skeleton: React.FC<SkeletonProps> = ({
@@ -42,19 +42,18 @@ const Skeleton: React.FC<SkeletonProps> = ({
 		outputRange: [COLORS.skeletonBase, COLORS.skeletonHighlight],
 	});
 
-	return (
-		<Animated.View
-			style={[
-				{
-					width,
-					height,
-					borderRadius,
-					backgroundColor,
-				},
-				style,
-			]}
-		/>
-	);
+	const skeletonStyle: Animated.WithAnimatedValue<ViewStyle> = {
+		width: width as any,
+		height,
+		borderRadius,
+		backgroundColor,
+	};
+
+	const AnimatedView = Animated.View as React.ComponentType<
+		Animated.AnimatedProps<ViewProps>
+	>;
+
+	return <AnimatedView style={[skeletonStyle, style]} />;
 };
 
 export default Skeleton;

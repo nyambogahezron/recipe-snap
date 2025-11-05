@@ -1,25 +1,26 @@
-import React, { useState } from 'react';
-import {
-	View,
-	Text,
-	TouchableOpacity,
-	Image,
-	ScrollView,
-	ActivityIndicator,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import SafeScreen from '../../components/SafeScreen';
-import { aiService } from '../../services/ai/aiService';
-import { cacheService } from '../../services/cacheService';
-import { toast } from '../../services/toastService';
-import { aiStyles } from '../../assets/styles/ai.styles';
+import { aiStyles } from '@/assets/styles/ai.styles';
+import SafeScreen from '@/components/SafeScreen';
 import { COLORS } from '@/constants/colors';
+import { useAuth } from '@/contexts/AuthContext';
+import { aiService } from '@/services/ai/aiService';
+import { cacheService } from '@/services/cacheService';
+import { toast } from '@/services/toastService';
 import {
 	AIFeature,
 	GenerateRecipeFromImageOutput,
 	IdentifyDishFromImageOutput,
-} from '../../types/ai';
+} from '@/types/ai';
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import React, { useState } from 'react';
+import {
+	ActivityIndicator,
+	Image,
+	ScrollView,
+	Text,
+	TouchableOpacity,
+	View,
+} from 'react-native';
 
 export default function AIScreen() {
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -31,9 +32,8 @@ export default function AIScreen() {
 	} | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
-	// For demo purposes, using a hardcoded user ID
-	// In a real app, this would come from authentication
-	const userId = 'user123';
+	const { user } = useAuth();
+	
 
 	const requestCameraPermissions = async () => {
 		const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -168,7 +168,7 @@ export default function AIScreen() {
 			const recipe = results.data as GenerateRecipeFromImageOutput;
 
 			const saveResponse = await aiService.saveAIRecipe({
-				userId,
+				userId: user?.id,
 				recipeName: recipe.recipeName,
 				ingredients: recipe.ingredients,
 				instructions: recipe.instructions,
@@ -183,8 +183,8 @@ export default function AIScreen() {
 				);
 
 				// Invalidate AI recipes cache to force refresh
-				await cacheService.invalidateCache('AI_RECIPES', userId);
-				await cacheService.invalidateCache('FAVORITES', userId);
+				await cacheService.invalidateCache('AI_RECIPES', userId: user?.id);
+				await cacheService.invalidateCache('FAVORITES', userId: user?.id);
 			} else {
 				throw new Error(saveResponse.error || 'Failed to save recipe');
 			}
