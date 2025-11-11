@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { generateRecipeFromImage } from '@/ai/flows/generate-recipe-from-image';
 import { identifyDishFromImage } from '@/ai/flows/identify-dish-from-image';
 import { Button } from '@/components/ui/button';
@@ -23,45 +23,64 @@ export default function Home() {
 		instructions: string[];
 	} | null>(null);
 	const [dishName, setDishName] = useState<string | null>(null);
+	const [isGeneratingRecipe, setIsGeneratingRecipe] = useState(false);
+	const [isIdentifyingDish, setIsIdentifyingDish] = useState(false);
 
-	const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+	const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 		if (file) {
+			// Validate file size (max 10MB)
+			const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+			if (file.size > maxSize) {
+				alert('Image file is too large. Please select an image smaller than 10MB.');
+				event.target.value = ''; // Reset file input
+				return;
+			}
+
 			const reader = new FileReader();
 			reader.onloadend = () => {
 				setPhotoDataUri(reader.result as string);
 			};
+			reader.onerror = () => {
+				alert('Failed to read the image file. Please try again.');
+			};
 			reader.readAsDataURL(file);
 		}
-	};
+	}, []);
 
-	const handleGenerateRecipe = async () => {
+	const handleGenerateRecipe = useCallback(async () => {
 		if (photoDataUri) {
+			setIsGeneratingRecipe(true);
 			try {
 				const recipeData = await generateRecipeFromImage({ photoDataUri });
 				setRecipe(recipeData);
 			} catch (error: any) {
 				console.error('Error generating recipe:', error);
 				alert(`Failed to generate recipe: ${error.message}`);
+			} finally {
+				setIsGeneratingRecipe(false);
 			}
 		} else {
 			alert('Please upload an image first.');
 		}
-	};
+	}, [photoDataUri]);
 
-	const handleIdentifyDish = async () => {
+	const handleIdentifyDish = useCallback(async () => {
 		if (photoDataUri) {
+			setIsIdentifyingDish(true);
 			try {
 				const dishData = await identifyDishFromImage({ photoDataUri });
 				setDishName(dishData.dishName);
 			} catch (error: any) {
 				console.error('Error identifying dish:', error);
 				alert(`Failed to identify dish: ${error.message}`);
+			} finally {
+				setIsIdentifyingDish(false);
 			}
 		} else {
 			alert('Please upload an image first.');
 		}
-	};
+	}, [photoDataUri]);
 
 	return (
 		<div className='flex flex-col items-center justify-start min-h-screen p-4 bg-background text-foreground'>
@@ -100,11 +119,11 @@ export default function Home() {
 						)}
 
 						<div className='flex justify-between'>
-							<Button onClick={handleGenerateRecipe} variant='destructive'>
-								Generate Recipe
+							<Button onClick={handleGenerateRecipe} variant='destructive' disabled={isGeneratingRecipe || !photoDataUri}>
+								{isGeneratingRecipe ? 'Generating...' : 'Generate Recipe'}
 							</Button>
-							<Button onClick={handleIdentifyDish} variant='secondary'>
-								Identify Dish
+							<Button onClick={handleIdentifyDish} variant='secondary' disabled={isIdentifyingDish || !photoDataUri}>
+								{isIdentifyingDish ? 'Identifying...' : 'Identify Dish'}
 							</Button>
 						</div>
 						{dishName && (
