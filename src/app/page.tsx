@@ -29,6 +29,14 @@ export default function Home() {
 	const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 		if (file) {
+			// Validate file size (max 10MB)
+			const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+			if (file.size > maxSize) {
+				alert('Image file is too large. Please select an image smaller than 10MB.');
+				event.target.value = ''; // Reset file input
+				return;
+			}
+
 			const reader = new FileReader();
 			reader.onloadend = () => {
 				setPhotoDataUri(reader.result as string);
