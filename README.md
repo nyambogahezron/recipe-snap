@@ -1,50 +1,90 @@
-# Welcome to your Expo app 👋
+# Recipe App 
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A monorepo workspace for the Recipe application using pnpm workspaces.
 
-## Get started
+## Structure
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+recipe/
+├── apps/
+│   ├── api/          # Backend API server
+│   └── mobile/       # React Native mobile app
+├── packages/         # Shared packages/libraries
+└── scripts/          # Build and utility scripts
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Getting Started
 
-## Learn more
+### Prerequisites
 
-To learn more about developing your project with Expo, look at the following resources:
+- Node.js (v18 or higher)
+- pnpm (v10.16.1+)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Installation
 
-## Join the community
+```bash
+# Install all dependencies across all workspaces
+pnpm install
 
-Join our community of developers creating universal apps.
+# Or use the alias
+pnpm install:all
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Development Scripts
+
+```bash
+# Run development servers for all apps
+pnpm dev
+
+# Run specific app
+pnpm api:dev      # Start API server
+pnpm mobile:dev   # Start mobile app
+
+# Build all apps
+pnpm build
+
+# Run tests across all workspaces
+pnpm test
+
+# Lint all code
+pnpm lint
+
+# Clean all build artifacts
+pnpm clean
+```
+
+### Workspace Commands
+
+```bash
+# Add dependency to specific workspace
+pnpm add <package> --filter api
+pnpm add <package> --filter mobile
+
+# Add dev dependency to root
+pnpm add -D <package> -w
+
+# Run command in specific workspace
+pnpm --filter api <command>
+pnpm --filter mobile <command>
+
+# Run command in all workspaces
+pnpm --recursive <command>
+```
+
+## Workspace Configuration
+
+The workspace is configured via:
+
+- `pnpm-workspace.yaml` - Defines workspace packages
+- `package.json` - Root package with workspace scripts
+- `.npmrc` - pnpm configuration with shamefully-hoist enabled
+- Individual `package.json` files in each app/package
+
+## Notes
+
+- **All packages are installed in the root `node_modules`** via shamefully-hoist configuration
+- Dependencies are fully hoisted and shared across all workspaces
+- Individual workspace `node_modules` contain only symlinks to root packages
+- Use `--filter` to target specific workspaces
+- Use `-w` flag to add dependencies to the root workspace
+- This setup provides better performance and reduces disk usage
