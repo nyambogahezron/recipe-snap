@@ -1,5 +1,8 @@
 import { aiStyles } from '@/assets/styles/ai.styles';
 import SafeScreen from '@/components/SafeScreen';
+import RecipeBottomSheet from '@/components/RecipeBottomSheet';
+import RecipeLoading from '@/components/RecipeLoading';
+import RecipeResults from '@/components/RecipeResults';
 import { COLORS } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { aiService } from '@/services/ai/aiService';
@@ -14,7 +17,6 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import {
-	ActivityIndicator,
 	Image,
 	ScrollView,
 	Text,
@@ -31,6 +33,8 @@ export default function AIScreen() {
 		data: GenerateRecipeFromImageOutput | IdentifyDishFromImageOutput;
 	} | null>(null);
 	const [error, setError] = useState<string | null>(null);
+	const [showBottomSheet, setShowBottomSheet] = useState(false);
+	const [currentFeature, setCurrentFeature] = useState<AIFeature | null>(null);
 
 	const { user } = useAuth();
 	
@@ -111,9 +115,11 @@ export default function AIScreen() {
 			return;
 		}
 
+		setCurrentFeature(feature);
 		setIsLoading(true);
 		setError(null);
 		setResults(null);
+		setShowBottomSheet(true);
 
 		try {
 			// Convert image to data URI
@@ -147,6 +153,14 @@ export default function AIScreen() {
 		setSelectedImage(null);
 		setResults(null);
 		setError(null);
+		setShowBottomSheet(false);
+		setCurrentFeature(null);
+	};
+
+	const closeBottomSheet = () => {
+		setShowBottomSheet(false);
+		setIsLoading(false);
+		setError(null);
 	};
 
 	const saveRecipe = async () => {
@@ -168,7 +182,7 @@ export default function AIScreen() {
 			const recipe = results.data as GenerateRecipeFromImageOutput;
 
 			const saveResponse = await aiService.saveAIRecipe({
-				userId: user?.id,
+				userId: user?.id || '',
 				recipeName: recipe.recipeName,
 				ingredients: recipe.ingredients,
 				instructions: recipe.instructions,
@@ -196,80 +210,6 @@ export default function AIScreen() {
 		}
 	};
 
-	const renderResults = () => {
-		if (!results) return null;
-
-		if (results.type === 'identify-dish') {
-			const data = results.data as IdentifyDishFromImageOutput;
-			return (
-				<View style={aiStyles.resultsContainer}>
-					<Text style={aiStyles.resultTitle}>Dish Identified! 🍽️</Text>
-					<Text style={aiStyles.dishName}>{data.dishName}</Text>
-					<Text style={aiStyles.confidence}>
-						Confidence: {Math.round(data.confidence * 100)}%
-					</Text>
-				</View>
-			);
-		} else {
-			const data = results.data as GenerateRecipeFromImageOutput;
-			return (
-				<View style={aiStyles.resultsContainer}>
-					<Text style={aiStyles.resultTitle}>Recipe Generated! 👨‍🍳</Text>
-					<Text style={aiStyles.recipeName}>{data.recipeName}</Text>
-
-					<Text style={aiStyles.sectionTitle}>Ingredients:</Text>
-					{data.ingredients && data.ingredients.length > 0 ? (
-						data.ingredients.map((ingredient, index) => (
-							<Text key={index} style={aiStyles.ingredientItem}>
-								• {ingredient}
-							</Text>
-						))
-					) : (
-						<Text style={aiStyles.ingredientItem}>
-							No ingredients available
-						</Text>
-					)}
-
-					<Text style={aiStyles.sectionTitle}>Instructions:</Text>
-					{data.instructions && data.instructions.length > 0 ? (
-						data.instructions.map((instruction, index) => (
-							<Text key={index} style={aiStyles.instructionItem}>
-								<Text style={aiStyles.instructionNumber}>{index + 1}.</Text>{' '}
-								{instruction}
-							</Text>
-						))
-					) : (
-						<Text style={aiStyles.instructionItem}>
-							No instructions available
-						</Text>
-					)}
-
-					{/* Save Recipe Button */}
-					<TouchableOpacity
-						style={[
-							aiStyles.actionButton,
-							{
-								backgroundColor: '#4CAF50', // Green color for save
-								marginTop: 20,
-								opacity: isSaving ? 0.7 : 1,
-							},
-						]}
-						onPress={saveRecipe}
-						disabled={isSaving}
-					>
-						{isSaving ? (
-							<ActivityIndicator size='small' color={COLORS.white} />
-						) : (
-							<Ionicons name='bookmark' size={20} color={COLORS.white} />
-						)}
-						<Text style={aiStyles.buttonText}>
-							{isSaving ? 'Saving...' : 'Save Recipe'}
-						</Text>
-					</TouchableOpacity>
-				</View>
-			);
-		}
-	};
 
 	return (
 		<SafeScreen>
@@ -348,37 +288,42 @@ export default function AIScreen() {
 					</View>
 				)}
 
-				{isLoading && (
-					<View style={aiStyles.loadingContainer}>
-						<ActivityIndicator size='large' color={COLORS.primary} />
-						<Text style={aiStyles.loadingText}>
-							{results?.type === 'identify-dish'
-								? 'Identifying dish...'
-								: 'Generating recipe...'}
-						</Text>
-					</View>
-				)}
-
-				{error && (
-					<View style={aiStyles.errorContainer}>
-						<Text style={aiStyles.errorText}>{error}</Text>
-						<TouchableOpacity
-							style={aiStyles.resetButton}
-							onPress={resetScreen}
-						>
-							<Text style={aiStyles.resetButtonText}>Try Again</Text>
-						</TouchableOpacity>
-					</View>
-				)}
-
-				{renderResults()}
-
-				{(selectedImage || results || error) && (
+				{(selectedImage) && (
 					<TouchableOpacity style={aiStyles.resetButton} onPress={resetScreen}>
 						<Text style={aiStyles.resetButtonText}>Start Over</Text>
 					</TouchableOpacity>
 				)}
 			</ScrollView>
+
+			{/* Bottom Sheet for Results */}
+			<RecipeBottomSheet
+				isVisible={showBottomSheet}
+				isLoading={isLoading}
+				onClose={closeBottomSheet}
+				title={currentFeature === 'identify-dish' ? 'Dish Identification' : 'Recipe Generation'}
+			>
+				{isLoading ? (
+					<RecipeLoading 
+						message={currentFeature === 'identify-dish' ? 'Identifying dish...' : 'Generating recipe...'}
+					/>
+				) : error ? (
+					<View style={aiStyles.errorContainer}>
+						<Text style={aiStyles.errorText}>{error}</Text>
+						<TouchableOpacity
+							style={aiStyles.resetButton}
+							onPress={closeBottomSheet}
+						>
+							<Text style={aiStyles.resetButtonText}>Try Again</Text>
+						</TouchableOpacity>
+					</View>
+				) : results ? (
+					<RecipeResults
+						results={results}
+						onSaveRecipe={results.type === 'generate-recipe' ? saveRecipe : undefined}
+						isSaving={isSaving}
+					/>
+				) : null}
+			</RecipeBottomSheet>
 		</SafeScreen>
 	);
 }

@@ -33,7 +33,7 @@ const HomeScreen = (): React.ReactElement => {
 	const [searchQuery, setSearchQuery] = useState<string>('');
 
 	// Filter recipes based on search query
-	const filteredRecipes = recipes.filter(recipe =>
+	const filteredRecipes = recipes.filter((recipe) =>
 		recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
 	);
 
@@ -110,27 +110,25 @@ const HomeScreen = (): React.ReactElement => {
 	// if (loading && !refreshing) return <HomeScreenSkeleton />;
 
 	return (
-		<BackgroundWrapper 
-			statusBarStyle="light-content"
-			overlayOpacity={0.4}
-		>
+		<BackgroundWrapper statusBarStyle='light-content' overlayOpacity={0.4}>
 			{/* Header with search */}
 			<Animated.View
 				style={homeStyles.modernHeader}
 				entering={FadeInDown.duration(600)}
 			>
-				<View style={homeStyles.searchContainer}>
-					<Search size={20} color={COLORS.white} style={homeStyles.searchIcon} />
-					<TextInput
-						style={[homeStyles.searchInput, { color: COLORS.white }]}
-						placeholder='Search recipes...'
-						placeholderTextColor="rgba(255, 255, 255, 0.7)"
-						value={searchQuery}
-						onChangeText={setSearchQuery}
+				<TouchableOpacity 
+					style={homeStyles.searchContainer}
+					activeOpacity={0.8}
+					onPress={() => router.push('/search')}
+				>
+					<Search
+						size={20}
+						color={COLORS.white}
+						style={homeStyles.searchIcon}
 					/>
-				</View>
-				<TouchableOpacity style={homeStyles.iconButton} activeOpacity={0.8}>
-					<Ionicons name="notifications-outline" size={24} color={COLORS.white} />
+					<Text style={[homeStyles.searchInput, { color: 'rgba(255, 255, 255, 0.7)' }]}>
+						Search recipes...
+					</Text>
 				</TouchableOpacity>
 			</Animated.View>
 

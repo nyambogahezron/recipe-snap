@@ -94,15 +94,42 @@ Generate a detailed recipe from a food image.
 {
   "success": true,
   "data": {
-    "dishName": "Pasta Carbonara",
-    "cuisine": "Italian",
-    "prepTime": 15,
-    "cookTime": 20,
-    "servings": 4,
-    "difficulty": "Medium",
-    "ingredients": [...],
-    "instructions": [...],
-    "nutritionalInfo": {...}
+    "recipeName": "Pasta Carbonara",
+    "ingredients": ["pasta", "eggs", "cheese", "..."],
+    "instructions": ["Cook pasta...", "Mix eggs...", "..."]
+  }
+}
+```
+
+### POST `/api/ai/search-recipes`
+
+Search for recipes using AI based on a text query.
+
+**Request Body:**
+```json
+{
+  "searchQuery": "chicken curry recipes"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "recipes": [
+      {
+        "name": "Butter Chicken Curry",
+        "description": "A creamy and flavorful Indian curry...",
+        "ingredients": ["chicken", "butter", "tomatoes", "..."],
+        "instructions": ["Marinate chicken...", "Heat butter...", "..."],
+        "cookingTime": 45,
+        "difficulty": "medium",
+        "cuisine": "Indian",
+        "servings": 4
+      }
+    ],
+    "searchTerm": "chicken curry recipes"
   }
 }
 ```

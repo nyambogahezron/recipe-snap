@@ -135,3 +135,22 @@ export type AuthParamList = {
 	'sign-up': undefined;
 	'verify-email': undefined;
 };
+
+// Search Types
+export interface SearchOptions {
+	searchType: 'api' | 'ai';
+}
+
+export interface SearchResult {
+	id: string;
+	title: string;
+	description?: string;
+	image: string;
+	ingredients?: string[];
+	instructions?: string[];
+	cookingTime?: number;
+	difficulty?: 'easy' | 'medium' | 'hard';
+	cuisine?: string;
+	servings?: number;
+	source: 'api' | 'ai';
+}

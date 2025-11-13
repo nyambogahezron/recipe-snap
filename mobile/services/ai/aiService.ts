@@ -3,6 +3,8 @@ import {
 	GenerateRecipeFromImageOutput,
 	IdentifyDishFromImageInput,
 	IdentifyDishFromImageOutput,
+	SearchRecipesWithAIInput,
+	SearchRecipesWithAIOutput,
 	SaveAIRecipeInput,
 	SaveAIRecipeOutput,
 	AIServiceResponse,
@@ -105,6 +107,47 @@ class AIService {
 					error instanceof Error
 						? error.message
 						: 'Failed to generate recipe from image',
+			};
+		}
+	}
+
+	/**
+	 * Searches for recipes using AI based on a text query
+	 * @param input - Search query
+	 * @returns Promise with AI-generated recipe suggestions
+	 */
+	async searchRecipesWithAI(
+		input: SearchRecipesWithAIInput
+	): Promise<AIServiceResponse<SearchRecipesWithAIOutput>> {
+		try {
+			const response = await fetch(`${API_URL}/ai/search-recipes`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					searchQuery: input.searchQuery,
+				}),
+			});
+
+			const result = await response.json();
+
+			if (!response.ok) {
+				throw new Error(result.error || 'Failed to search recipes with AI');
+			}
+
+			return {
+				success: result.success,
+				data: result.data,
+			};
+		} catch (error) {
+			console.error('Error searching recipes with AI:', error);
+			return {
+				success: false,
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to search recipes with AI',
 			};
 		}
 	}

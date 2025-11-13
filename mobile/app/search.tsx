@@ -1,28 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
 	View,
 	Text,
 	TextInput,
 	TouchableOpacity,
 	FlatList,
+	Alert,
 } from 'react-native';
 import { MealAPI, TransformedMeal } from '@/services/mealAPI';
 import { useDebounce } from '@/hooks/useDebounce';
 import { searchStyles } from '@/assets/styles/search.styles';
 import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { Search, Filter } from 'lucide-react-native';
+import { Search, Filter, Sparkles, Globe } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import RecipeCard from '@/components/RecipeCard';
+import AIRecipeCard from '@/components/AIRecipeCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import SearchScreenSkeleton from '@/components/Skeletons/SearchScreenSkeleton';
 import BackgroundWrapper from '@/components/BackgroundWrapper';
+import { aiService } from '@/services/ai/aiService';
+import { SearchResult } from '@/types/index';
 
 const SearchScreen = () => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [recipes, setRecipes] = useState<TransformedMeal[]>([]);
+	const [aiRecipes, setAIRecipes] = useState<SearchResult[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [initialLoading, setInitialLoading] = useState(true);
+	const [searchType, setSearchType] = useState<'api' | 'ai'>('api');
 
 	const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
@@ -51,6 +57,38 @@ const SearchScreen = () => {
 			.filter((meal) => meal !== null);
 	};
 
+	const performAISearch = useCallback(async (query: string): Promise<SearchResult[]> => {
+		if (!query.trim()) {
+			return [];
+		}
+
+		try {
+			const result = await aiService.searchRecipesWithAI({ searchQuery: query });
+			
+			if (!result.success || !result.data) {
+				throw new Error(result.error || 'Failed to search recipes with AI');
+			}
+
+			return result.data.recipes.map((recipe: any, index: number) => ({
+				id: `ai-${index}`,
+				title: recipe.name,
+				description: recipe.description,
+				image: 'https://via.placeholder.com/300x200?text=AI+Recipe', // placeholder for AI recipes
+				ingredients: recipe.ingredients,
+				instructions: recipe.instructions,
+				cookingTime: recipe.cookingTime,
+				difficulty: recipe.difficulty,
+				cuisine: recipe.cuisine,
+				servings: recipe.servings,
+				source: 'ai' as const,
+			}));
+		} catch (error) {
+			console.error('Error performing AI search:', error);
+			Alert.alert('Error', 'Failed to search recipes with AI. Please try again.');
+			return [];
+		}
+	}, []);
+
 	useEffect(() => {
 		const loadInitialData = async () => {
 			try {
@@ -73,18 +111,29 @@ const SearchScreen = () => {
 			setLoading(true);
 
 			try {
-				const results = await performSearch(debouncedSearchQuery);
-				setRecipes(results);
+				if (searchType === 'api') {
+					const results = await performSearch(debouncedSearchQuery);
+					setRecipes(results);
+					setAIRecipes([]);
+				} else {
+					const results = await performAISearch(debouncedSearchQuery);
+					setAIRecipes(results);
+					setRecipes([]);
+				}
 			} catch (error) {
 				console.error('Error searching:', error);
-				setRecipes([]);
+				if (searchType === 'api') {
+					setRecipes([]);
+				} else {
+					setAIRecipes([]);
+				}
 			} finally {
 				setLoading(false);
 			}
 		};
 
 		handleSearch();
-	}, [debouncedSearchQuery, initialLoading]);
+	}, [debouncedSearchQuery, initialLoading, searchType, performAISearch]);
 
 	if (initialLoading) return <SearchScreenSkeleton />;
 
@@ -126,23 +175,77 @@ const SearchScreen = () => {
 				</TouchableOpacity>
 			</Animated.View>
 
+			{/* Search Type Toggle */}
+			<View style={searchStyles.searchTypeToggle}>
+				<TouchableOpacity
+					style={[
+						searchStyles.toggleButton,
+						searchType === 'api' && searchStyles.toggleButtonActive,
+					]}
+					onPress={() => setSearchType('api')}
+				>
+					<Globe size={16} color={searchType === 'api' ? COLORS.white : COLORS.primary} />
+					<Text
+						style={[
+							searchStyles.toggleButtonText,
+							searchType === 'api' && searchStyles.toggleButtonTextActive,
+						]}
+					>
+						Recipe API
+					</Text>
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={[
+						searchStyles.toggleButton,
+						searchType === 'ai' && searchStyles.toggleButtonActive,
+					]}
+					onPress={() => setSearchType('ai')}
+				>
+					<Sparkles size={16} color={searchType === 'ai' ? COLORS.white : COLORS.primary} />
+					<Text
+						style={[
+							searchStyles.toggleButtonText,
+							searchType === 'ai' && searchStyles.toggleButtonTextActive,
+						]}
+					>
+						AI Suggestions
+					</Text>
+				</TouchableOpacity>
+			</View>
+
 			<View style={searchStyles.resultsSection}>
 				<View style={searchStyles.resultsHeader}>
 					<Text style={searchStyles.resultsTitle}>
 						{searchQuery ? `Results for "${searchQuery}"` : 'Popular Recipes'}
 					</Text>
-					<Text style={searchStyles.resultsCount}>{recipes.length} found</Text>
+					<Text style={searchStyles.resultsCount}>
+						{searchType === 'api' ? recipes.length : aiRecipes.length} found
+					</Text>
 				</View>
 
 				{loading ? (
 					<View style={searchStyles.loadingContainer}>
-						<LoadingSpinner message='Searching recipes...' size='small' />
+						<LoadingSpinner 
+							message={searchType === 'api' ? 'Searching recipes...' : 'Generating AI suggestions...'} 
+							size='small' 
+						/>
 					</View>
-				) : (
+				) : searchType === 'api' ? (
 					<FlatList
 						data={recipes}
 						renderItem={({ item }) => <RecipeCard recipe={item} />}
 						keyExtractor={(item) => item.id.toString()}
+						numColumns={2}
+						columnWrapperStyle={searchStyles.row}
+						contentContainerStyle={searchStyles.recipesGrid}
+						showsVerticalScrollIndicator={false}
+						ListEmptyComponent={<NoResultsFound />}
+					/>
+				) : (
+					<FlatList
+						data={aiRecipes}
+						renderItem={({ item }) => <AIRecipeCard recipe={item} />}
+						keyExtractor={(item) => item.id}
 						numColumns={2}
 						columnWrapperStyle={searchStyles.row}
 						contentContainerStyle={searchStyles.recipesGrid}

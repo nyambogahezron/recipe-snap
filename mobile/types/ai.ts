@@ -19,6 +19,27 @@ export interface IdentifyDishFromImageOutput {
 	confidence: number; // 0-1 confidence level
 }
 
+// AI Search types
+export interface SearchRecipesWithAIInput {
+	searchQuery: string;
+}
+
+export interface RecipeSearchResult {
+	name: string;
+	description: string;
+	ingredients: string[];
+	instructions: string[];
+	cookingTime: number;
+	difficulty: 'easy' | 'medium' | 'hard';
+	cuisine?: string;
+	servings: number;
+}
+
+export interface SearchRecipesWithAIOutput {
+	recipes: RecipeSearchResult[];
+	searchTerm: string;
+}
+
 export interface SaveAIRecipeInput {
 	userId: string;
 	recipeName: string;

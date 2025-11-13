@@ -17,6 +17,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import * as SystemUI from 'expo-system-ui';
 import { COLORS } from '@/constants/colors';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 SystemUI.setBackgroundColorAsync(COLORS.background);
 
@@ -64,15 +65,17 @@ export default function RootLayout() {
 	}
 
 	return (
-		<AuthProvider>
-			<AlertProvider>
-				<Stack screenOptions={{ headerShown: false }}>
-					<Stack.Screen name='index' options={{ headerShown: false }} />
-					<Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-					<Stack.Screen name='(auth)' options={{ headerShown: false }} />
-					<Stack.Screen name='recipe/[id]' options={{ headerShown: false }} />
-				</Stack>
-			</AlertProvider>
-		</AuthProvider>
+		<GestureHandlerRootView style={{ flex: 1 }}>
+			<AuthProvider>
+				<AlertProvider>
+					<Stack screenOptions={{ headerShown: false }}>
+						<Stack.Screen name='index' options={{ headerShown: false }} />
+						<Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+						<Stack.Screen name='(auth)' options={{ headerShown: false }} />
+						<Stack.Screen name='recipe/[id]' options={{ headerShown: false }} />
+					</Stack>
+				</AlertProvider>
+			</AuthProvider>
+		</GestureHandlerRootView>
 	);
 }

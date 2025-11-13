@@ -11,6 +11,11 @@ import type {
 } from '../types/api';
 import { identifyDishFromImage } from '../ai/flows/identify-dish-from-image';
 import { generateRecipeFromImage } from '../ai/flows/generate-recipe-from-image';
+import { 
+	searchRecipesWithAI,
+	SearchRecipesWithAIInput,
+	SearchRecipesWithAIOutput 
+} from '../ai/flows/search-recipes-with-ai';
 
 /**
  * AI Controller
@@ -157,6 +162,37 @@ export class AIController {
 			}
 
 			const result = await generateRecipeFromImage({ photoDataUri });
+
+			res.status(200).json({
+				success: true,
+				data: result,
+			});
+		}
+	);
+
+	/**
+	 * Search recipes using AI
+	 */
+	static searchRecipes = AsyncHandler(
+		async (
+			req: Request<
+				{},
+				ApiResponse<SearchRecipesWithAIOutput>,
+				SearchRecipesWithAIInput
+			>,
+			res: Response<ApiResponse<SearchRecipesWithAIOutput>>
+		) => {
+			const { searchQuery } = req.body;
+
+			if (!searchQuery || typeof searchQuery !== 'string') {
+				throw new BadRequestError('Search query is required');
+			}
+
+			if (searchQuery.trim().length === 0) {
+				throw new BadRequestError('Search query cannot be empty');
+			}
+
+			const result = await searchRecipesWithAI({ searchQuery });
 
 			res.status(200).json({
 				success: true,
