@@ -7,5 +7,9 @@ export default function AuthRoutesLayout(): React.ReactElement {
 
 	if (isSignedIn) return <Redirect href={'/'} />;
 
-	return <Stack screenOptions={{ headerShown: false }} />;
+	return (
+		<Stack screenOptions={{ headerShown: false }}>
+			<Stack.Screen name="landing" />
+		</Stack>
+	);
 }

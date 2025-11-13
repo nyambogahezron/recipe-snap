@@ -11,9 +11,12 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { searchStyles } from '@/assets/styles/search.styles';
 import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
+import { Search, Filter } from 'lucide-react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import RecipeCard from '@/components/RecipeCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import SearchScreenSkeleton from '@/components/Skeletons/SearchScreenSkeleton';
+import BackgroundWrapper from '@/components/BackgroundWrapper';
 
 const SearchScreen = () => {
 	const [searchQuery, setSearchQuery] = useState('');
@@ -86,19 +89,21 @@ const SearchScreen = () => {
 	if (initialLoading) return <SearchScreenSkeleton />;
 
 	return (
-		<View style={searchStyles.container}>
-			<View style={searchStyles.searchSection}>
+		<BackgroundWrapper
+			statusBarStyle="light-content"
+			overlayOpacity={0.4}
+		>
+			{/* Modern Header */}
+			<Animated.View
+				style={searchStyles.modernHeader}
+				entering={FadeInDown.duration(600)}
+			>
 				<View style={searchStyles.searchContainer}>
-					<Ionicons
-						name='search'
-						size={20}
-						color={COLORS.textLight}
-						style={searchStyles.searchIcon}
-					/>
+					<Search size={20} color={COLORS.white} style={searchStyles.searchIcon} />
 					<TextInput
-						style={searchStyles.searchInput}
+						style={[searchStyles.searchInput, { color: COLORS.white }]}
 						placeholder='Search recipes, ingredients...'
-						placeholderTextColor={COLORS.textLight}
+						placeholderTextColor="rgba(255, 255, 255, 0.7)"
 						value={searchQuery}
 						onChangeText={setSearchQuery}
 						returnKeyType='search'
@@ -111,12 +116,15 @@ const SearchScreen = () => {
 							<Ionicons
 								name='close-circle'
 								size={20}
-								color={COLORS.textLight}
+								color="rgba(255, 255, 255, 0.7)"
 							/>
 						</TouchableOpacity>
 					)}
 				</View>
-			</View>
+				<TouchableOpacity style={searchStyles.iconButton} activeOpacity={0.8}>
+					<Filter size={20} color={COLORS.white} />
+				</TouchableOpacity>
+			</Animated.View>
 
 			<View style={searchStyles.resultsSection}>
 				<View style={searchStyles.resultsHeader}>
@@ -143,7 +151,7 @@ const SearchScreen = () => {
 					/>
 				)}
 			</View>
-		</View>
+		</BackgroundWrapper>
 	);
 };
 export default SearchScreen;

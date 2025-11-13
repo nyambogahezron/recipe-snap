@@ -1,6 +1,6 @@
 export const COLORS = {
-	primary: '#301B3F',
-	background: '#FEF3E2',
+	primary: '#f16f26',
+	background: '#261910',
 	text: '#B4A5A5',
 	border: '#F2D9D5',
 	white: '#FFFFFF',
@@ -10,4 +10,5 @@ export const COLORS = {
 	skeletonBase: '#E1E4E8',
 	skeletonHighlight: '#F6F8FA',
 	gray: '#808080',
+	accent : '#af807cff',
 };

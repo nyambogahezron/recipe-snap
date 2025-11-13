@@ -15,9 +15,12 @@ import { toast } from '@/services/toastService';
 import { favoritesStyles } from '@/assets/styles/favorites.styles';
 import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
+import { Heart, Filter } from 'lucide-react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import RecipeCard from '@/components/RecipeCard';
 import NoFavoritesFound from '@/components/NoFavoritesFound';
 import RecipeListSkeleton from '@/components/Skeletons/RecipeListSkeleton';
+import BackgroundWrapper from '@/components/BackgroundWrapper';
 import { Recipe } from '@/types';
 
 const FavoritesScreen = () => {
@@ -179,23 +182,51 @@ const FavoritesScreen = () => {
 	// Show skeleton loading on initial load
 	if (loading && favoriteRecipes.length === 0) {
 		return (
-			<View style={favoritesStyles.container}>
+			<BackgroundWrapper 
+				statusBarStyle="light-content"
+				overlayOpacity={0.4}
+			>
 				<View style={favoritesStyles.header}>
-					<Text style={favoritesStyles.title}>Favorites</Text>
+					<Text style={[favoritesStyles.title, { color: COLORS.white }]}>Favorites</Text>
 					<TouchableOpacity
 						style={favoritesStyles.logoutButton}
 						onPress={handleSignOut}
 					>
-						<Ionicons name='log-out-outline' size={22} color={COLORS.text} />
+						<Ionicons name='log-out-outline' size={22} color={COLORS.white} />
 					</TouchableOpacity>
 				</View>
 				<RecipeListSkeleton count={6} numColumns={2} />
-			</View>
+			</BackgroundWrapper>
 		);
 	}
 
 	return (
-		<View style={favoritesStyles.container}>
+		<BackgroundWrapper
+			statusBarStyle="light-content"
+			overlayOpacity={0.4}
+		>
+			{/* Modern Header */}
+			<Animated.View
+				style={favoritesStyles.modernHeader}
+				entering={FadeInDown.duration(600)}
+			>
+				<View style={favoritesStyles.headerLeft}>
+					<Heart size={24} color={COLORS.white} />
+					<Text style={[favoritesStyles.headerTitle, { color: COLORS.white }]}>My Favorites</Text>
+				</View>
+				<View style={favoritesStyles.headerRight}>
+					<TouchableOpacity style={favoritesStyles.iconButton} activeOpacity={0.8}>
+						<Filter size={20} color={COLORS.white} />
+					</TouchableOpacity>
+					<TouchableOpacity
+						style={favoritesStyles.logoutButton}
+						onPress={handleSignOut}
+					>
+						<Ionicons name='log-out-outline' size={22} color={COLORS.white} />
+					</TouchableOpacity>
+				</View>
+			</Animated.View>
+
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				refreshControl={
@@ -207,16 +238,6 @@ const FavoritesScreen = () => {
 					/>
 				}
 			>
-				<View style={favoritesStyles.header}>
-					<Text style={favoritesStyles.title}>Favorites</Text>
-					<TouchableOpacity
-						style={favoritesStyles.logoutButton}
-						onPress={handleSignOut}
-					>
-						<Ionicons name='log-out-outline' size={22} color={COLORS.text} />
-					</TouchableOpacity>
-				</View>
-
 				{/* Stats Section */}
 				{(regularFavoritesCount > 0 || aiRecipesCount > 0) && (
 					<View style={favoritesStyles.statsContainer}>
@@ -257,7 +278,7 @@ const FavoritesScreen = () => {
 					/>
 				</View>
 			</ScrollView>
-		</View>
+		</BackgroundWrapper>
 	);
 };
 export default FavoritesScreen;

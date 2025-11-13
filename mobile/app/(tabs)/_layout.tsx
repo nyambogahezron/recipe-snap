@@ -19,14 +19,12 @@ const TabsLayout = (): React.ReactElement | null => {
 			screenOptions={{
 				headerShown: false,
 				tabBarActiveTintColor: COLORS.primary,
-				tabBarInactiveTintColor: COLORS.textLight,
+				tabBarInactiveTintColor: COLORS.accent,
 				tabBarStyle: {
-					backgroundColor: COLORS.white,
-					borderTopColor: COLORS.border,
-					borderTopWidth: 1,
+					backgroundColor: COLORS.background,
 					paddingBottom: insets.bottom,
 					paddingTop: 8,
-					height: 100,
+					height: 80,
 				},
 				tabBarLabelStyle: {
 					fontSize: 12,
@@ -40,15 +38,6 @@ const TabsLayout = (): React.ReactElement | null => {
 					title: 'Recipes',
 					tabBarIcon: ({ color, size }) => (
 						<Ionicons name='restaurant' size={size} color={color} />
-					),
-				}}
-			/>
-			<Tabs.Screen
-				name='search'
-				options={{
-					title: 'Search',
-					tabBarIcon: ({ color, size }) => (
-						<Ionicons name='search' size={size} color={color} />
 					),
 				}}
 			/>

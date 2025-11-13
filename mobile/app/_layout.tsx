@@ -15,7 +15,10 @@ import * as Fonts from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
+import * as SystemUI from 'expo-system-ui';
+import { COLORS } from '@/constants/colors';
 
+SystemUI.setBackgroundColorAsync(COLORS.background);
 
 SplashScreen.preventAutoHideAsync();
 
@@ -64,6 +67,7 @@ export default function RootLayout() {
 		<AuthProvider>
 			<AlertProvider>
 				<Stack screenOptions={{ headerShown: false }}>
+					<Stack.Screen name='index' options={{ headerShown: false }} />
 					<Stack.Screen name='(tabs)' options={{ headerShown: false }} />
 					<Stack.Screen name='(auth)' options={{ headerShown: false }} />
 					<Stack.Screen name='recipe/[id]' options={{ headerShown: false }} />

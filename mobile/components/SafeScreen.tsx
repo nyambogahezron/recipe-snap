@@ -1,22 +1,15 @@
 import React from 'react';
-import { View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLORS } from '../constants/colors';
+import BackgroundWrapper from './BackgroundWrapper';
 import { SafeScreenProps } from '../types';
 
 const SafeScreen: React.FC<SafeScreenProps> = ({ children }) => {
-	const insets = useSafeAreaInsets();
-
 	return (
-		<View
-			style={{
-				paddingTop: insets.top,
-				flex: 1,
-				backgroundColor: COLORS.background,
-			}}
+		<BackgroundWrapper
+			statusBarStyle="light-content"
+			overlayOpacity={0.4}
 		>
 			{children}
-		</View>
+		</BackgroundWrapper>
 	);
 };
 

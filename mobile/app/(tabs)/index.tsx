@@ -6,6 +6,7 @@ import {
 	TouchableOpacity,
 	FlatList,
 	RefreshControl,
+	TextInput,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MealAPI } from '@/services/mealAPI';
@@ -13,9 +14,12 @@ import { homeStyles } from '@/assets/styles/home.styles';
 import { Image } from 'expo-image';
 import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
+import { Search } from 'lucide-react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import CategoryFilter from '@/components/CategoryFilter';
 import RecipeCard from '@/components/RecipeCard';
 import HomeScreenSkeleton from '@/components/Skeletons/HomeScreenSkeleton';
+import BackgroundWrapper from '@/components/BackgroundWrapper';
 import { CategoryData, Recipe } from '@/types';
 
 const HomeScreen = (): React.ReactElement => {
@@ -26,6 +30,12 @@ const HomeScreen = (): React.ReactElement => {
 	const [featuredRecipe, setFeaturedRecipe] = useState<Recipe | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [refreshing, setRefreshing] = useState<boolean>(false);
+	const [searchQuery, setSearchQuery] = useState<string>('');
+
+	// Filter recipes based on search query
+	const filteredRecipes = recipes.filter(recipe =>
+		recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
+	);
 
 	const loadData = useCallback(async (): Promise<void> => {
 		try {
@@ -97,10 +107,33 @@ const HomeScreen = (): React.ReactElement => {
 		loadData();
 	}, [loadData]);
 
-	if (loading && !refreshing) return <HomeScreenSkeleton />;
+	// if (loading && !refreshing) return <HomeScreenSkeleton />;
 
 	return (
-		<View style={homeStyles.container}>
+		<BackgroundWrapper 
+			statusBarStyle="light-content"
+			overlayOpacity={0.4}
+		>
+			{/* Header with search */}
+			<Animated.View
+				style={homeStyles.modernHeader}
+				entering={FadeInDown.duration(600)}
+			>
+				<View style={homeStyles.searchContainer}>
+					<Search size={20} color={COLORS.white} style={homeStyles.searchIcon} />
+					<TextInput
+						style={[homeStyles.searchInput, { color: COLORS.white }]}
+						placeholder='Search recipes...'
+						placeholderTextColor="rgba(255, 255, 255, 0.7)"
+						value={searchQuery}
+						onChangeText={setSearchQuery}
+					/>
+				</View>
+				<TouchableOpacity style={homeStyles.iconButton} activeOpacity={0.8}>
+					<Ionicons name="notifications-outline" size={24} color={COLORS.white} />
+				</TouchableOpacity>
+			</Animated.View>
+
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				refreshControl={
@@ -191,9 +224,9 @@ const HomeScreen = (): React.ReactElement => {
 						<Text style={homeStyles.sectionTitle}>{selectedCategory}</Text>
 					</View>
 
-					{recipes.length > 0 ? (
+					{filteredRecipes.length > 0 ? (
 						<FlatList
-							data={recipes}
+							data={filteredRecipes}
 							renderItem={({ item }) => <RecipeCard recipe={item} />}
 							keyExtractor={(item) => item.id.toString()}
 							numColumns={2}
@@ -217,7 +250,7 @@ const HomeScreen = (): React.ReactElement => {
 					)}
 				</View>
 			</ScrollView>
-		</View>
+		</BackgroundWrapper>
 	);
 };
 export default HomeScreen;
