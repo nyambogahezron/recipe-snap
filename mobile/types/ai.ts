@@ -1,4 +1,4 @@
-// AI Types for Recipe Snap Mobile App
+// AI Types for Bite Mobile App
 
 export interface GenerateRecipeFromImageInput {
 	photoDataUri: string; // Base64 encoded image with data URI format

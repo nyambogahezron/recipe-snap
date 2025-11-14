@@ -1,4 +1,4 @@
-# Recipe Snap API
+# Bite API
 
 A clean, lightweight AI-powered API for recipe generation and dish identification.
 

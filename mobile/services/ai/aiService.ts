@@ -13,7 +13,7 @@ import { API_URL } from '../../constants/api';
 import { aiRecipesService } from '../../database/services';
 
 /**
- * AI Service for Recipe Snap Mobile App
+ * AI Service for Bite Mobile App
  * This service handles AI recipe generation by communicating with the backend API
  * and stores results locally on the device using SQLite
  *

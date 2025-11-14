@@ -1,0 +1,93 @@
+MIT License
+
+Copyright (c) 2025 Hezron Nyamboga
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Additional Terms and Conditions
+
+### Third-Party Licenses
+
+This software includes components from third-party projects with their own licenses:
+
+#### Dependencies
+- React Native (MIT License)
+- Expo SDK (MIT License)
+- Express.js (MIT License)
+- Google Genkit (Apache-2.0 License)
+- TypeScript (Apache-2.0 License)
+
+#### AI Services
+This application uses Google AI services through the Google Generative AI API. Use of these services is subject to:
+- Google AI Terms of Service
+- Google Privacy Policy
+- Google Cloud Platform Terms of Service
+
+Users are responsible for complying with Google's terms when using AI features.
+
+### Data and Privacy
+
+While this software is open source, users deploying this software are responsible for:
+- Compliance with applicable data protection laws (GDPR, CCPA, etc.)
+- Proper handling of user data and uploaded images
+- Implementing appropriate security measures
+- Providing accurate privacy policies to end users
+
+### Commercial Use
+
+This software may be used for commercial purposes under the MIT license terms, provided that:
+- The original copyright notice is retained
+- Users comply with all third-party service terms (Google AI, etc.)
+- Users implement their own privacy policies and terms of service
+
+### Contributions
+
+By contributing to this project, you agree that your contributions will be licensed under the same MIT license.
+
+### Disclaimer of Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. THE AUTHORS DO NOT WARRANT THAT THE SOFTWARE WILL MEET YOUR REQUIREMENTS OR THAT ITS OPERATION WILL BE UNINTERRUPTED OR ERROR-FREE.
+
+### Limitation of Liability
+
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE USE OF THIS SOFTWARE, INCLUDING BUT NOT LIMITED TO:
+- Data loss or corruption
+- Service interruptions
+- AI-generated content accuracy
+- Third-party service failures
+
+### Patent Rights
+
+This license does not grant permission to use trade names, trademarks, service marks, or product names of the licensor, except as required for reasonable and customary use in describing the origin of the software.
+
+### Governing Law
+
+This license shall be governed by and construed in accordance with the laws of the jurisdiction where the original author resides, without regard to its conflict of law provisions.
+
+### Contact Information
+
+For questions about this license or the software:
+- GitHub: https://github.com/nyambogahezron/bite
+- Issues: https://github.com/nyambogahezron/bite/issues
+
+---
+
+Last updated: November 2025

@@ -1,4 +1,4 @@
-## Recipe Snap — Copilot Instructions
+## Bite — Copilot Instructions
 
 This repo is a pnpm monorepo with two primary apps: `api` (AI backend) and `mobile` (Expo React Native app).
 

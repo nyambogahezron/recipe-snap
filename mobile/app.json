@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Recipe Snap",
-    "slug": "recipe-snap",
+    "name": "Bite",
+    "slug": "bite",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "recipe-snap",
+    "scheme": "bite",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
