@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "dist/server.js",
   "scripts": {
     "build": "bun build src/server.ts --outdir dist --target node",

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Bite",
     "slug": "bite",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "bite",
@@ -17,7 +17,7 @@
         "backgroundImage": "./assets/images/adaptive-icon/background.png"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.hezron.recipesnap"
+      "package": "com.hezron.bite"
     },
     "web": {
       "bundler": "metro",
@@ -41,10 +41,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "0a79599f-0fdc-43eb-92ce-5713fec3b4fd"
-      }
+      "router": {}
     }
   }
 }
