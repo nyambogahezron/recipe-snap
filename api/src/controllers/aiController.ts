@@ -74,6 +74,11 @@ export class AIController {
 
 			const result = await identifyDishFromImage({ photoDataUri });
 
+			// Validate result structure
+			if (!result || !result.dishName) {
+				throw new BadRequestError('Invalid response from AI service');
+			}
+
 			res.status(200).json({
 				success: true,
 				data: result,
@@ -163,6 +168,16 @@ export class AIController {
 
 			const result = await generateRecipeFromImage({ photoDataUri });
 
+			// Validate result structure
+			if (!result || !result.recipeName || !Array.isArray(result.ingredients) || !Array.isArray(result.instructions)) {
+				throw new BadRequestError('Invalid response from AI service');
+			}
+
+			// Validate arrays are not empty
+			if (result.ingredients.length === 0 || result.instructions.length === 0) {
+				throw new BadRequestError('AI service returned incomplete recipe data');
+			}
+
 			res.status(200).json({
 				success: true,
 				data: result,
@@ -193,6 +208,17 @@ export class AIController {
 			}
 
 			const result = await searchRecipesWithAI({ searchQuery });
+
+			// Validate result structure
+			if (!result || !Array.isArray(result.recipes)) {
+				throw new BadRequestError('Invalid response from AI service');
+			}
+
+			// Ensure we have at least some results or empty array
+			if (result.recipes.length === 0) {
+				// This is acceptable - just means no recipes found
+				console.log(`No recipes found for query: ${searchQuery}`);
+			}
 
 			res.status(200).json({
 				success: true,

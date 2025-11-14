@@ -241,31 +241,41 @@ const FavoritesScreen = () => {
 				{/* Stats Section */}
 				{(regularFavoritesCount > 0 || aiRecipesCount > 0) && (
 					<View style={favoritesStyles.statsContainer}>
-						<View style={favoritesStyles.statCard}>
+						<Animated.View 
+							style={favoritesStyles.statCard}
+							entering={FadeInDown.delay(200).duration(400).springify()}
+						>
 							<Text style={favoritesStyles.statNumber}>
 								{regularFavoritesCount}
 							</Text>
 							<Text style={favoritesStyles.statLabel}>Saved Recipes</Text>
-						</View>
-						<View style={favoritesStyles.statCard}>
+						</Animated.View>
+						<Animated.View 
+							style={favoritesStyles.statCard}
+							entering={FadeInDown.delay(300).duration(400).springify()}
+						>
 							<Text style={favoritesStyles.statNumber}>{aiRecipesCount}</Text>
 							<Text style={favoritesStyles.statLabel}>AI Recipes</Text>
-						</View>
-						<View style={favoritesStyles.statCard}>
+						</Animated.View>
+						<Animated.View 
+							style={favoritesStyles.statCard}
+							entering={FadeInDown.delay(400).duration(400).springify()}
+						>
 							<Text style={favoritesStyles.statNumber}>
 								{favoriteRecipes.length}
 							</Text>
 							<Text style={favoritesStyles.statLabel}>Total</Text>
-						</View>
+						</Animated.View>
 					</View>
 				)}
 
 				<View style={favoritesStyles.recipesSection}>
 					<FlatList
 						data={favoriteRecipes}
-						renderItem={({ item }) => (
+						renderItem={({ item, index }) => (
 							<RecipeCard
 								recipe={item}
+								index={index}
 								onLongPress={() => handleRemoveFromFavorites(item)}
 							/>
 						)}

@@ -50,7 +50,36 @@ export type SearchRecipesWithAIOutput = z.infer<
 export async function searchRecipesWithAI(
 	input: SearchRecipesWithAIInput
 ): Promise<SearchRecipesWithAIOutput> {
-	return searchRecipesWithAIFlow(input);
+	try {
+		// Validate input
+		if (!input.searchQuery) {
+			throw new Error('searchQuery is required');
+		}
+
+		if (typeof input.searchQuery !== 'string') {
+			throw new Error('searchQuery must be a string');
+		}
+
+		const trimmedQuery = input.searchQuery.trim();
+		if (trimmedQuery.length === 0) {
+			throw new Error('searchQuery cannot be empty');
+		}
+
+		if (trimmedQuery.length > 500) {
+			throw new Error('searchQuery is too long. Maximum length is 500 characters');
+		}
+
+		return await searchRecipesWithAIFlow(input);
+	} catch (error) {
+		console.error('Error in searchRecipesWithAI:', error);
+		
+		// Re-throw with more context if it's already a known error
+		if (error instanceof Error) {
+			throw error;
+		}
+		
+		throw new Error('Failed to search recipes. Please try again with a valid search query.');
+	}
 }
 
 const prompt = ai.definePrompt({

@@ -233,7 +233,9 @@ const SearchScreen = () => {
 				) : searchType === 'api' ? (
 					<FlatList
 						data={recipes}
-						renderItem={({ item }) => <RecipeCard recipe={item} />}
+						renderItem={({ item, index }) => (
+							<RecipeCard recipe={item} index={index} />
+						)}
 						keyExtractor={(item) => item.id.toString()}
 						numColumns={2}
 						columnWrapperStyle={searchStyles.row}
@@ -244,7 +246,9 @@ const SearchScreen = () => {
 				) : (
 					<FlatList
 						data={aiRecipes}
-						renderItem={({ item }) => <AIRecipeCard recipe={item} />}
+						renderItem={({ item, index }) => (
+							<AIRecipeCard recipe={item} index={index} />
+						)}
 						keyExtractor={(item) => item.id}
 						numColumns={2}
 						columnWrapperStyle={searchStyles.row}

@@ -6,15 +6,23 @@ import {
 	Platform,
 	ScrollView,
 	TextInput,
-	TouchableOpacity,
+	Pressable,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
+import Animated, {
+	useSharedValue,
+	useAnimatedStyle,
+	withSpring,
+	FadeInDown,
+} from 'react-native-reanimated';
 import { authStyles } from '@/assets/styles/auth.styles';
 import { Image } from 'expo-image';
 import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const SignUpScreen = () => {
 	const router = useRouter();
@@ -24,6 +32,11 @@ const SignUpScreen = () => {
 	const [name, setName] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const buttonScale = useSharedValue(1);
+
+	const buttonAnimatedStyle = useAnimatedStyle(() => ({
+		transform: [{ scale: buttonScale.value }],
+	}));
 
 	const handleSignUp = async () => {
 		const trimmedEmail = email.trim().toLowerCase();
@@ -93,19 +106,30 @@ const SignUpScreen = () => {
 					showsVerticalScrollIndicator={false}
 				>
 					{/* Image Container */}
-					<View style={authStyles.imageContainer}>
+					<Animated.View 
+						style={authStyles.imageContainer}
+						entering={FadeInDown.delay(100).duration(500).springify()}
+					>
 						<Image
 							source={require('../../assets/images/i2.png')}
 							style={authStyles.image}
 							contentFit='contain'
 						/>
-					</View>
+					</Animated.View>
 
-					<Text style={authStyles.title}>Create Account</Text>
+					<Animated.Text 
+						style={authStyles.title}
+						entering={FadeInDown.delay(200).duration(500).springify()}
+					>
+						Create Account
+					</Animated.Text>
 
 					<View style={authStyles.formContainer}>
 						{/* Name Input (Optional) */}
-						<View style={authStyles.inputContainer}>
+						<Animated.View 
+							style={authStyles.inputContainer}
+							entering={FadeInDown.delay(300).duration(400).springify()}
+						>
 							<TextInput
 								style={authStyles.textInput}
 								placeholder='Enter your name (optional)'
@@ -114,10 +138,13 @@ const SignUpScreen = () => {
 								onChangeText={setName}
 								autoCapitalize='words'
 							/>
-						</View>
+						</Animated.View>
 
 						{/* Email Input */}
-						<View style={authStyles.inputContainer}>
+						<Animated.View 
+							style={authStyles.inputContainer}
+							entering={FadeInDown.delay(400).duration(400).springify()}
+						>
 							<TextInput
 								style={authStyles.textInput}
 								placeholder='Enter email'
@@ -127,10 +154,13 @@ const SignUpScreen = () => {
 								keyboardType='email-address'
 								autoCapitalize='none'
 							/>
-						</View>
+						</Animated.View>
 
 						{/* Password Input */}
-						<View style={authStyles.inputContainer}>
+						<Animated.View 
+							style={authStyles.inputContainer}
+							entering={FadeInDown.delay(500).duration(400).springify()}
+						>
 							<TextInput
 								style={authStyles.textInput}
 								placeholder='Enter password'
@@ -140,7 +170,7 @@ const SignUpScreen = () => {
 								secureTextEntry={!showPassword}
 								autoCapitalize='none'
 							/>
-							<TouchableOpacity
+							<Pressable
 								style={authStyles.eyeButton}
 								onPress={() => setShowPassword(!showPassword)}
 							>
@@ -149,34 +179,49 @@ const SignUpScreen = () => {
 									size={20}
 									color={COLORS.textLight}
 								/>
-							</TouchableOpacity>
-						</View>
+							</Pressable>
+						</Animated.View>
 
 						{/* Sign Up Button */}
-						<TouchableOpacity
+						<AnimatedPressable
 							style={[
 								authStyles.authButton,
 								loading && authStyles.buttonDisabled,
+								buttonAnimatedStyle,
 							]}
 							onPress={handleSignUp}
 							disabled={loading}
-							activeOpacity={0.8}
+							onPressIn={() => {
+								buttonScale.value = withSpring(0.95, {
+									damping: 15,
+									stiffness: 300,
+								});
+							}}
+							onPressOut={() => {
+								buttonScale.value = withSpring(1, {
+									damping: 15,
+									stiffness: 300,
+								});
+							}}
+							entering={FadeInDown.delay(600).duration(400).springify()}
 						>
 							<Text style={authStyles.buttonText}>
 								{loading ? 'Creating Account...' : 'Sign Up'}
 							</Text>
-						</TouchableOpacity>
+						</AnimatedPressable>
 
 						{/* Sign In Link */}
-						<TouchableOpacity
+						<Animated.View
 							style={authStyles.linkContainer}
-							onPress={() => router.back()}
+							entering={FadeInDown.delay(700).duration(400).springify()}
 						>
-							<Text style={authStyles.linkText}>
-								Already have an account?{' '}
-								<Text style={authStyles.link}>Sign In</Text>
-							</Text>
-						</TouchableOpacity>
+							<Pressable onPress={() => router.back()}>
+								<Text style={authStyles.linkText}>
+									Already have an account?{' '}
+									<Text style={authStyles.link}>Sign In</Text>
+								</Text>
+							</Pressable>
+						</Animated.View>
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>

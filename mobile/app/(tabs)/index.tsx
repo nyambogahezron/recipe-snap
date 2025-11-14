@@ -15,12 +15,20 @@ import { Image } from 'expo-image';
 import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Search } from 'lucide-react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated, { 
+	FadeInDown, 
+	useSharedValue, 
+	useAnimatedStyle, 
+	withSpring 
+} from 'react-native-reanimated';
+import { Pressable } from 'react-native';
 import CategoryFilter from '@/components/CategoryFilter';
 import RecipeCard from '@/components/RecipeCard';
 import HomeScreenSkeleton from '@/components/Skeletons/HomeScreenSkeleton';
 import BackgroundWrapper from '@/components/BackgroundWrapper';
 import { CategoryData, Recipe } from '@/types';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const HomeScreen = (): React.ReactElement => {
 	const router = useRouter();
@@ -31,6 +39,11 @@ const HomeScreen = (): React.ReactElement => {
 	const [loading, setLoading] = useState<boolean>(true);
 	const [refreshing, setRefreshing] = useState<boolean>(false);
 	const [searchQuery, setSearchQuery] = useState<string>('');
+	const featuredScale = useSharedValue(1);
+
+	const featuredAnimatedStyle = useAnimatedStyle(() => ({
+		transform: [{ scale: featuredScale.value }],
+	}));
 
 	// Filter recipes based on search query
 	const filteredRecipes = recipes.filter((recipe) =>
@@ -153,11 +166,25 @@ const HomeScreen = (): React.ReactElement => {
 
 				{/* FEATURED SECTION */}
 				{featuredRecipe && (
-					<View style={homeStyles.featuredSection}>
-						<TouchableOpacity
-							style={homeStyles.featuredCard}
-							activeOpacity={0.9}
+					<Animated.View 
+						style={homeStyles.featuredSection}
+						entering={FadeInDown.delay(200).duration(500).springify()}
+					>
+						<AnimatedPressable
+							style={[homeStyles.featuredCard, featuredAnimatedStyle]}
 							onPress={() => router.push(`/recipe/${featuredRecipe.id}`)}
+							onPressIn={() => {
+								featuredScale.value = withSpring(0.98, {
+									damping: 15,
+									stiffness: 300,
+								});
+							}}
+							onPressOut={() => {
+								featuredScale.value = withSpring(1, {
+									damping: 15,
+									stiffness: 300,
+								});
+							}}
 						>
 							<View style={homeStyles.featuredImageContainer}>
 								<Image
@@ -167,11 +194,17 @@ const HomeScreen = (): React.ReactElement => {
 									transition={500}
 								/>
 								<View style={homeStyles.featuredOverlay}>
-									<View style={homeStyles.featuredBadge}>
+									<Animated.View 
+										style={homeStyles.featuredBadge}
+										entering={FadeInDown.delay(400).duration(400)}
+									>
 										<Text style={homeStyles.featuredBadgeText}>Featured</Text>
-									</View>
+									</Animated.View>
 
-									<View style={homeStyles.featuredContent}>
+									<Animated.View 
+										style={homeStyles.featuredContent}
+										entering={FadeInDown.delay(500).duration(400)}
+									>
 										<Text style={homeStyles.featuredTitle} numberOfLines={2}>
 											{featuredRecipe.title}
 										</Text>
@@ -210,11 +243,11 @@ const HomeScreen = (): React.ReactElement => {
 												</View>
 											)}
 										</View>
-									</View>
+									</Animated.View>
 								</View>
 							</View>
-						</TouchableOpacity>
-					</View>
+						</AnimatedPressable>
+					</Animated.View>
 				)}
 
 				<View style={homeStyles.recipesSection}>
@@ -225,7 +258,9 @@ const HomeScreen = (): React.ReactElement => {
 					{filteredRecipes.length > 0 ? (
 						<FlatList
 							data={filteredRecipes}
-							renderItem={({ item }) => <RecipeCard recipe={item} />}
+							renderItem={({ item, index }) => (
+								<RecipeCard recipe={item} index={index} />
+							)}
 							keyExtractor={(item) => item.id.toString()}
 							numColumns={2}
 							columnWrapperStyle={homeStyles.row}

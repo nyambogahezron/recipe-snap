@@ -130,6 +130,14 @@ export default function ErrorHandlerMiddleware(
 		return;
 	}
 
+	// Log error for debugging (but don't expose sensitive info to client)
+	console.error('Error occurred:', {
+		message: err.message,
+		stack: err.stack,
+		name: err.name,
+		...(err as any).code && { code: (err as any).code },
+	});
+
 	res.status(customError.statusCode).json({
 		message: customError.message,
 		stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,

@@ -2,7 +2,7 @@ import React from 'react';
 import {
 	View,
 	Text,
-	TouchableOpacity,
+	Pressable,
 	Image,
 	StyleSheet,
 	Alert,
@@ -10,17 +10,54 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Clock, Users, ChefHat } from 'lucide-react-native';
+import Animated, {
+	useSharedValue,
+	useAnimatedStyle,
+	withSpring,
+	withTiming,
+	FadeInDown,
+} from 'react-native-reanimated';
 import { SearchResult } from '@/types/index';
 import { COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/fonts';
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 interface AIRecipeCardProps {
 	recipe: SearchResult;
 	onPress?: () => void;
+	index?: number;
 }
 
-const AIRecipeCard: React.FC<AIRecipeCardProps> = ({ recipe, onPress }) => {
+const AIRecipeCard: React.FC<AIRecipeCardProps> = ({ recipe, onPress, index = 0 }) => {
+	const scale = useSharedValue(1);
+	const opacity = useSharedValue(1);
+
+	const animatedStyle = useAnimatedStyle(() => {
+		return {
+			transform: [{ scale: scale.value }],
+			opacity: opacity.value,
+		};
+	});
+
+	const handlePressIn = () => {
+		scale.value = withSpring(0.95, {
+			damping: 15,
+			stiffness: 300,
+		});
+	};
+
+	const handlePressOut = () => {
+		scale.value = withSpring(1, {
+			damping: 15,
+			stiffness: 300,
+		});
+	};
+
 	const handlePress = () => {
+		opacity.value = withTiming(0.7, { duration: 100 }, () => {
+			opacity.value = withTiming(1, { duration: 100 });
+		});
 		if (onPress) {
 			onPress();
 		} else {
@@ -68,7 +105,13 @@ const AIRecipeCard: React.FC<AIRecipeCardProps> = ({ recipe, onPress }) => {
 	};
 
 	return (
-		<TouchableOpacity style={styles.card} onPress={handlePress} activeOpacity={0.9}>
+		<AnimatedPressable
+			style={[styles.card, animatedStyle]}
+			onPress={handlePress}
+			onPressIn={handlePressIn}
+			onPressOut={handlePressOut}
+			entering={FadeInDown.delay(index * 50).duration(400).springify()}
+		>
 			<Image source={{ uri: recipe.image }} style={styles.image} />
 			
 			{/* AI Badge */}
@@ -118,7 +161,7 @@ const AIRecipeCard: React.FC<AIRecipeCardProps> = ({ recipe, onPress }) => {
 					)}
 				</View>
 			</View>
-		</TouchableOpacity>
+		</AnimatedPressable>
 	);
 };
 

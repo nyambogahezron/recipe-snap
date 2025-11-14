@@ -95,6 +95,7 @@ export interface CategoryData {
 export interface RecipeCardProps {
 	recipe: Recipe;
 	onLongPress?: () => void;
+	index?: number;
 }
 
 export interface CategoryFilterProps {

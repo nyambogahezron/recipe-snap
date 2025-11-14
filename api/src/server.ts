@@ -9,7 +9,17 @@ import ErrorHandlerMiddleware from './middleware/errorHandler.js';
 const app = express();
 const PORT = ENV.PORT || 5001;
 
-app.use(express.json());
+// Request timeout middleware (30 seconds)
+app.use((req, res, next) => {
+	req.setTimeout(30000, () => {
+		res.status(408).json({ message: 'Request timeout. Please try again.' });
+	});
+	next();
+});
+
+// Body size limit (10MB for images)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(cors());
 

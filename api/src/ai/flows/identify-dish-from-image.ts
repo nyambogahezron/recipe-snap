@@ -25,7 +25,34 @@ export type IdentifyDishFromImageOutput = z.infer<
 export async function identifyDishFromImage(
 	input: IdentifyDishFromImageInput
 ): Promise<IdentifyDishFromImageOutput> {
-	return identifyDishFromImageFlow(input);
+	try {
+		// Validate input
+		if (!input.photoDataUri) {
+			throw new Error('photoDataUri is required');
+		}
+
+		// Validate data URI format
+		if (!input.photoDataUri.startsWith('data:') || !input.photoDataUri.includes('base64,')) {
+			throw new Error('Invalid data URI format. Expected format: data:<mimetype>;base64,<encoded_data>');
+		}
+
+		// Validate base64 data exists
+		const base64Part = input.photoDataUri.split('base64,')[1];
+		if (!base64Part || base64Part.trim().length === 0) {
+			throw new Error('Invalid data URI: missing base64 encoded data');
+		}
+
+		return await identifyDishFromImageFlow(input);
+	} catch (error) {
+		console.error('Error in identifyDishFromImage:', error);
+		
+		// Re-throw with more context if it's already a known error
+		if (error instanceof Error) {
+			throw error;
+		}
+		
+		throw new Error('Failed to identify dish from image. Please ensure the image is valid and try again.');
+	}
 }
 
 const prompt = ai.definePrompt({
