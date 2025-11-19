@@ -9,6 +9,10 @@ import {
 	Inter_700Bold,
 	Inter_800ExtraBold,
 } from '@expo-google-fonts/inter';
+import {
+	RobotoMono_400Regular,
+	RobotoMono_700Bold,
+} from '@expo-google-fonts/roboto-mono';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import * as Fonts from 'expo-font';
@@ -43,6 +47,8 @@ export default function RootLayout() {
 					Inter_600SemiBold,
 					Inter_700Bold,
 					Inter_800ExtraBold,
+					RobotoMono_400Regular,
+					RobotoMono_700Bold,
 				});
 			} catch (e) {
 				console.warn('Error loading fonts:', e);

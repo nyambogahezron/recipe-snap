@@ -6,7 +6,8 @@ import {
 	TouchableOpacity,
 	FlatList,
 	RefreshControl,
-	TextInput,
+	ActivityIndicator,
+	Pressable,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MealAPI } from '@/services/mealAPI';
@@ -15,18 +16,17 @@ import { Image } from 'expo-image';
 import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Search } from 'lucide-react-native';
-import Animated, { 
-	FadeInDown, 
-	useSharedValue, 
-	useAnimatedStyle, 
-	withSpring 
+import Animated, {
+	FadeInDown,
+	useSharedValue,
+	useAnimatedStyle,
+	withSpring,
 } from 'react-native-reanimated';
-import { Pressable } from 'react-native';
 import CategoryFilter from '@/components/CategoryFilter';
 import RecipeCard from '@/components/RecipeCard';
-import HomeScreenSkeleton from '@/components/Skeletons/HomeScreenSkeleton';
 import BackgroundWrapper from '@/components/BackgroundWrapper';
 import { CategoryData, Recipe } from '@/types';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -120,7 +120,16 @@ const HomeScreen = (): React.ReactElement => {
 		loadData();
 	}, [loadData]);
 
-	// if (loading && !refreshing) return <HomeScreenSkeleton />;
+	if (loading && !refreshing)
+		return (
+			<SafeAreaView style={{ flex: 1, backgroundColor: COLORS.background }}>
+				<ActivityIndicator
+					size='large'
+					color={COLORS.primary}
+					style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+				/>
+			</SafeAreaView>
+		);
 
 	return (
 		<BackgroundWrapper statusBarStyle='light-content' overlayOpacity={0.4}>
@@ -129,7 +138,7 @@ const HomeScreen = (): React.ReactElement => {
 				style={homeStyles.modernHeader}
 				entering={FadeInDown.duration(600)}
 			>
-				<TouchableOpacity 
+				<TouchableOpacity
 					style={homeStyles.searchContainer}
 					activeOpacity={0.8}
 					onPress={() => router.push('/search')}
@@ -139,7 +148,12 @@ const HomeScreen = (): React.ReactElement => {
 						color={COLORS.white}
 						style={homeStyles.searchIcon}
 					/>
-					<Text style={[homeStyles.searchInput, { color: 'rgba(255, 255, 255, 0.7)' }]}>
+					<Text
+						style={[
+							homeStyles.searchInput,
+							{ color: 'rgba(255, 255, 255, 0.7)' },
+						]}
+					>
 						Search recipes...
 					</Text>
 				</TouchableOpacity>
@@ -155,18 +169,10 @@ const HomeScreen = (): React.ReactElement => {
 					/>
 				}
 				contentContainerStyle={homeStyles.scrollContent}
-			>
-				{categories.length > 0 && (
-					<CategoryFilter
-						categories={categories}
-						selectedCategory={selectedCategory || ''}
-						onSelectCategory={handleCategorySelect}
-					/>
-				)}
-
+				>
 				{/* FEATURED SECTION */}
 				{featuredRecipe && (
-					<Animated.View 
+					<Animated.View
 						style={homeStyles.featuredSection}
 						entering={FadeInDown.delay(200).duration(500).springify()}
 					>
@@ -194,14 +200,14 @@ const HomeScreen = (): React.ReactElement => {
 									transition={500}
 								/>
 								<View style={homeStyles.featuredOverlay}>
-									<Animated.View 
+									<Animated.View
 										style={homeStyles.featuredBadge}
 										entering={FadeInDown.delay(400).duration(400)}
 									>
 										<Text style={homeStyles.featuredBadgeText}>Featured</Text>
 									</Animated.View>
 
-									<Animated.View 
+									<Animated.View
 										style={homeStyles.featuredContent}
 										entering={FadeInDown.delay(500).duration(400)}
 									>
@@ -249,6 +255,14 @@ const HomeScreen = (): React.ReactElement => {
 						</AnimatedPressable>
 					</Animated.View>
 				)}
+				{categories.length > 0 && (
+					<CategoryFilter
+						categories={categories}
+						selectedCategory={selectedCategory || ''}
+						onSelectCategory={handleCategorySelect}
+					/>
+				)}
+
 
 				<View style={homeStyles.recipesSection}>
 					<View style={homeStyles.sectionHeader}>

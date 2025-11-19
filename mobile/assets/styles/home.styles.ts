@@ -29,7 +29,6 @@ export const homeStyles = StyleSheet.create({
 		backgroundColor: COLORS.gray,
 		borderRadius: 12,
 		paddingHorizontal: 12,
-		marginRight: 12,
 		
 	},
 	searchIcon: {
