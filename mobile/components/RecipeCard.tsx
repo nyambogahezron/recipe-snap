@@ -63,6 +63,12 @@ export default function RecipeCard({
 			entering={FadeInDown.delay(index * 50).duration(400).springify()}
 		>
 			<View style={recipeCardStyles.imageContainer}>
+				{recipe.source === 'ai' && (
+					<View style={recipeCardStyles.aiBadge}>
+						<Ionicons name='sparkles' size={12} color={COLORS.white} />
+						<Text style={recipeCardStyles.aiBadgeText}>AI</Text>
+					</View>
+				)}
 				<Image
 					source={{ uri: recipe.image }}
 					style={recipeCardStyles.image}

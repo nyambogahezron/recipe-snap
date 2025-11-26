@@ -127,8 +127,9 @@ export type RootStackParamList = {
 
 export type TabsParamList = {
 	index: undefined;
-	search: undefined;
 	favorites: undefined;
+	ai: undefined;
+	profile: undefined;
 };
 
 export type AuthParamList = {

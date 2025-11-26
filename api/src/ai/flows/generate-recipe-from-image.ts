@@ -80,15 +80,16 @@ const prompt = ai.definePrompt({
 				.describe('The step-by-step instructions to prepare the recipe.'),
 		}),
 	},
-	prompt: `You are an expert chef and recipe creator. Given a photo of ingredients or a dish, create a complete recipe with a creative name, ingredient list, and step-by-step cooking instructions.
-
-Analyze the image and provide:
-1. A creative and appealing recipe name
-2. A complete list of ingredients with quantities
-3. Clear, step-by-step cooking instructions
-
-Photo: {{media url=photoDataUri}}
-`,
+	prompt: `You are an expert chef and recipe creator. 
+			Given a photo of ingredients or a dish, create a 
+			complete recipe with a creative name, ingredient list, 
+			and step-by-step cooking instructions. 
+			Ensure the recipe is easy to follow and can be prepared by a beginner.
+			Analyze the image and provide:
+			1. A creative and appealing recipe name
+			2. A complete list of ingredients with quantities
+			3. Clear, step-by-step cooking instructions
+			Photo: {{media url=photoDataUri}}`,
 });
 
 const generateRecipeFromImageFlow = ai.defineFlow<

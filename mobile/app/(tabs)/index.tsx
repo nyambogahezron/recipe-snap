@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import {
 	View,
 	Text,
-	ScrollView,
 	TouchableOpacity,
 	FlatList,
 	RefreshControl,
@@ -17,9 +16,12 @@ import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Search } from 'lucide-react-native';
 import Animated, {
+	Extrapolation,
 	FadeInDown,
-	useSharedValue,
+	interpolate,
+	useAnimatedScrollHandler,
 	useAnimatedStyle,
+	useSharedValue,
 	withSpring,
 } from 'react-native-reanimated';
 import CategoryFilter from '@/components/CategoryFilter';
@@ -40,10 +42,43 @@ const HomeScreen = (): React.ReactElement => {
 	const [refreshing, setRefreshing] = useState<boolean>(false);
 	const [searchQuery, setSearchQuery] = useState<string>('');
 	const featuredScale = useSharedValue(1);
+	const scrollY = useSharedValue(0);
 
 	const featuredAnimatedStyle = useAnimatedStyle(() => ({
 		transform: [{ scale: featuredScale.value }],
 	}));
+
+	const parallaxHeaderStyle = useAnimatedStyle(() => {
+		const translateY = interpolate(
+			scrollY.value,
+			[0, 180],
+			[0, -120],
+			Extrapolation.CLAMP
+		);
+		const scale = interpolate(
+			scrollY.value,
+			[-100, 0],
+			[1.1, 1],
+			Extrapolation.CLAMP
+		);
+		const opacity = interpolate(
+			scrollY.value,
+			[0, 140],
+			[1, 0.6],
+			Extrapolation.CLAMP
+		);
+
+		return {
+			transform: [{ translateY }, { scale }],
+			opacity,
+		};
+	});
+
+	const handleScroll = useAnimatedScrollHandler({
+		onScroll: (event) => {
+			scrollY.value = event.contentOffset.y;
+		},
+	});
 
 	// Filter recipes based on search query
 	const filteredRecipes = recipes.filter((recipe) =>
@@ -133,33 +168,7 @@ const HomeScreen = (): React.ReactElement => {
 
 	return (
 		<BackgroundWrapper statusBarStyle='light-content' overlayOpacity={0.4}>
-			{/* Header with search */}
-			<Animated.View
-				style={homeStyles.modernHeader}
-				entering={FadeInDown.duration(600)}
-			>
-				<TouchableOpacity
-					style={homeStyles.searchContainer}
-					activeOpacity={0.8}
-					onPress={() => router.push('/search')}
-				>
-					<Search
-						size={20}
-						color={COLORS.white}
-						style={homeStyles.searchIcon}
-					/>
-					<Text
-						style={[
-							homeStyles.searchInput,
-							{ color: 'rgba(255, 255, 255, 0.7)' },
-						]}
-					>
-						Search recipes...
-					</Text>
-				</TouchableOpacity>
-			</Animated.View>
-
-			<ScrollView
+			<Animated.ScrollView
 				showsVerticalScrollIndicator={false}
 				refreshControl={
 					<RefreshControl
@@ -169,7 +178,36 @@ const HomeScreen = (): React.ReactElement => {
 					/>
 				}
 				contentContainerStyle={homeStyles.scrollContent}
-				>
+				stickyHeaderIndices={categories.length > 0 ? [1] : undefined}
+				onScroll={handleScroll}
+				scrollEventThrottle={16}
+			>
+				<Animated.View style={[homeStyles.parallaxHeader, parallaxHeaderStyle]}>
+					<Animated.View
+						style={homeStyles.modernHeader}
+						entering={FadeInDown.duration(600)}
+					>
+						<TouchableOpacity
+							style={homeStyles.searchContainer}
+							activeOpacity={0.8}
+							onPress={() => router.push('/search')}
+						>
+							<Search
+								size={20}
+								color={COLORS.white}
+								style={homeStyles.searchIcon}
+							/>
+							<Text
+								style={[
+									homeStyles.searchInput,
+									{ color: 'rgba(255, 255, 255, 0.7)' },
+								]}
+							>
+								Search recipes...
+							</Text>
+						</TouchableOpacity>
+					</Animated.View>
+
 				{/* FEATURED SECTION */}
 				{featuredRecipe && (
 					<Animated.View
@@ -255,12 +293,15 @@ const HomeScreen = (): React.ReactElement => {
 						</AnimatedPressable>
 					</Animated.View>
 				)}
+				</Animated.View>
 				{categories.length > 0 && (
+					<View style={homeStyles.stickyCategoryWrapper}>
 					<CategoryFilter
 						categories={categories}
 						selectedCategory={selectedCategory || ''}
 						onSelectCategory={handleCategorySelect}
 					/>
+					</View>
 				)}
 
 
@@ -296,7 +337,7 @@ const HomeScreen = (): React.ReactElement => {
 						</View>
 					)}
 				</View>
-			</ScrollView>
+			</Animated.ScrollView>
 		</BackgroundWrapper>
 	);
 };

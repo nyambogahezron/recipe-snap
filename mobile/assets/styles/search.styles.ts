@@ -7,6 +7,19 @@ export const searchStyles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: COLORS.background,
 	},
+	loadingState: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+		rowGap: 12,
+		paddingHorizontal: 24,
+	},
+	loadingStateText: {
+		color: COLORS.white,
+		fontFamily: FONTS.medium,
+		fontSize: 15,
+		textAlign: 'center',
+	},
 	modernHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -123,6 +136,12 @@ export const searchStyles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
+		rowGap: 12,
+	},
+	loadingText: {
+		color: COLORS.white,
+		fontFamily: FONTS.medium,
+		fontSize: 14,
 	},
 	recipesGrid: {
 		gap: 16,
@@ -191,5 +210,114 @@ export const searchStyles = StyleSheet.create({
 	toggleButtonTextActive: {
 		color: COLORS.white,
 		fontFamily: FONTS.semibold,
+	},
+	heroWrapper: {
+		paddingHorizontal: 20,
+		paddingTop: 12,
+	},
+	heroCard: {
+		borderRadius: 24,
+		padding: 20,
+		borderWidth: 1,
+		borderColor: 'rgba(255,255,255,0.1)',
+	},
+	heroTextGroup: {
+		rowGap: 8,
+	},
+	heroEyebrow: {
+		fontSize: 12,
+		textTransform: 'uppercase',
+		letterSpacing: 1,
+		color: 'rgba(255,255,255,0.7)',
+		fontFamily: FONTS.semibold,
+	},
+	heroTitle: {
+		fontSize: 26,
+		fontFamily: FONTS.extrabold,
+		color: COLORS.white,
+	},
+	heroSubtitle: {
+		color: 'rgba(255,255,255,0.8)',
+		fontFamily: FONTS.regular,
+		fontSize: 14,
+		lineHeight: 20,
+	},
+	heroButtons: {
+		flexDirection: 'row',
+		columnGap: 12,
+		marginTop: 16,
+	},
+	heroButton: {
+		flex: 1,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		columnGap: 8,
+		borderRadius: 16,
+		paddingVertical: 12,
+		borderWidth: 1,
+		borderColor: 'rgba(255,255,255,0.2)',
+	},
+	heroButtonActive: {
+		backgroundColor: 'rgba(0,0,0,0.4)',
+		borderColor: COLORS.primary,
+	},
+	heroButtonText: {
+		color: COLORS.white,
+		fontFamily: FONTS.semibold,
+	},
+	promptsContainer: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		gap: 12,
+		paddingHorizontal: 20,
+		paddingTop: 12,
+	},
+	promptChip: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: 6,
+		paddingHorizontal: 14,
+		paddingVertical: 8,
+		borderRadius: 999,
+		borderWidth: 1,
+		borderColor: 'rgba(255,255,255,0.2)',
+		backgroundColor: 'rgba(0,0,0,0.25)',
+	},
+	promptChipActive: {
+		borderColor: COLORS.primary,
+		backgroundColor: 'rgba(255,255,255,0.15)',
+	},
+	promptChipText: {
+		color: COLORS.white,
+		fontFamily: FONTS.medium,
+		fontSize: 13,
+	},
+	recentContainer: {
+		paddingHorizontal: 20,
+		paddingTop: 12,
+	},
+	recentLabel: {
+		fontSize: 13,
+		fontFamily: FONTS.medium,
+		color: 'rgba(255,255,255,0.7)',
+		marginBottom: 10,
+	},
+	recentChips: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		gap: 10,
+	},
+	recentChip: {
+		paddingHorizontal: 14,
+		paddingVertical: 8,
+		borderRadius: 16,
+		borderWidth: 1,
+		borderColor: 'rgba(255,255,255,0.15)',
+	},
+	recentChipText: {
+		color: COLORS.white,
+		fontFamily: FONTS.medium,
+		fontSize: 13,
 	},
 });

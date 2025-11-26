@@ -173,4 +173,29 @@ export const favoritesStyles = StyleSheet.create({
 		fontFamily: FONTS.semibold,
 		color: COLORS.white,
 	},
+	loadingWrapper: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+		rowGap: 12,
+		paddingHorizontal: 24,
+	},
+	loadingText: {
+		color: COLORS.white,
+		fontFamily: FONTS.medium,
+		fontSize: 15,
+		textAlign: 'center',
+	},
+	helperRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: 8,
+		paddingHorizontal: 20,
+		marginTop: 16,
+	},
+	helperText: {
+		color: 'rgba(255,255,255,0.8)',
+		fontFamily: FONTS.regular,
+		fontSize: 13,
+	},
 });

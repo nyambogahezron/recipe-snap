@@ -215,96 +215,130 @@ export default function AIScreen() {
 		<SafeScreen>
 			<ScrollView
 				style={aiStyles.container}
+				contentContainerStyle={aiStyles.scrollContent}
 				showsVerticalScrollIndicator={false}
 			>
-				<Text style={aiStyles.title}>AI Recipe Assistant</Text>
-				<Text style={aiStyles.subtitle}>
-					Upload or take a photo to identify dishes or generate recipes using AI
-				</Text>
-
-				<View style={aiStyles.buttonContainer}>
-					<TouchableOpacity style={aiStyles.actionButton} onPress={takePhoto}>
-						<Ionicons name='camera' size={24} color={COLORS.white} />
-						<Text style={aiStyles.buttonText}>Take Photo</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity
-						style={[aiStyles.actionButton, aiStyles.secondaryButton]}
-						onPress={pickImage}
-					>
-						<Ionicons name='images' size={24} color={COLORS.primary} />
-						<Text style={[aiStyles.buttonText, aiStyles.secondaryButtonText]}>
-							Choose from Gallery
+				<View style={aiStyles.surfaceCard}>
+					<View style={aiStyles.cardHeader}>
+						<Text style={aiStyles.cardLabel}>Image Source</Text>
+						<Text style={aiStyles.cardDescription}>
+							Capture a dish live or pull something from your gallery. High quality images lead to richer recipes.
 						</Text>
-					</TouchableOpacity>
+					</View>
+
+					<View style={aiStyles.commandRow}>
+						<TouchableOpacity style={aiStyles.primaryButton} onPress={takePhoto}>
+							<Ionicons name='camera' size={18} color={COLORS.white} />
+							<Text style={aiStyles.primaryButtonText}>Capture photo</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							style={[aiStyles.primaryButton, aiStyles.ghostButton]}
+							onPress={pickImage}
+						>
+							<Ionicons name='images' size={18} color={COLORS.white} />
+							<Text style={aiStyles.primaryButtonText}>Choose gallery</Text>
+						</TouchableOpacity>
+					</View>
+
+					<View style={aiStyles.previewShell}>
+						{selectedImage ? (
+							<Image
+								source={{ uri: selectedImage }}
+								style={aiStyles.previewImage}
+							/>
+						) : (
+							<View style={aiStyles.dropzone}>
+								<Ionicons name='cloud-upload-outline' size={32} color={COLORS.text} />
+								<Text style={aiStyles.dropzoneTitle}>Awaiting your photo</Text>
+								<Text style={aiStyles.dropzoneSubtitle}>
+									Add a dish snapshot to unlock AI actions below.
+								</Text>
+							</View>
+						)}
+					</View>
+
+					{selectedImage && (
+						<TouchableOpacity
+							style={aiStyles.resetGhostButton}
+							onPress={resetScreen}
+						>
+							<Ionicons name='close-circle' size={16} color={COLORS.text} />
+							<Text style={aiStyles.resetGhostText}>Remove image</Text>
+						</TouchableOpacity>
+					)}
 				</View>
 
-				{selectedImage && (
-					<View style={aiStyles.imageContainer}>
-						<Image
-							source={{ uri: selectedImage }}
-							style={aiStyles.selectedImage}
-						/>
+				<View style={aiStyles.surfaceCard}>
+					<View style={aiStyles.cardHeader}>
+						<Text style={aiStyles.cardLabel}>AI Actions</Text>
+						<Text style={aiStyles.cardDescription}>
+							{selectedImage
+								? 'Pick a mode and the assistant responds instantly.'
+								: 'Add a photo to enable the assistant modes.'}
+						</Text>
+					</View>
 
-						<View
+					<View style={aiStyles.featureStack}>
+						<TouchableOpacity
 							style={[
-								aiStyles.buttonContainer,
-								{ marginTop: 20, marginBottom: 0 },
+								aiStyles.featureButton,
+								currentFeature === 'identify-dish' && aiStyles.featureButtonActive,
+								(!selectedImage || isLoading) && aiStyles.featureButtonDisabled,
 							]}
+							onPress={() => processImage('identify-dish')}
+							disabled={!selectedImage || isLoading}
 						>
-							<TouchableOpacity
-								style={aiStyles.actionButton}
-								onPress={() => processImage('identify-dish')}
-								disabled={isLoading}
-							>
-								<Ionicons name='search' size={20} color={COLORS.white} />
-								<Text style={aiStyles.buttonText}>Identify Dish</Text>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								style={[aiStyles.actionButton, aiStyles.secondaryButton]}
-								onPress={() => processImage('generate-recipe')}
-								disabled={isLoading}
-							>
-								<Ionicons name='restaurant' size={20} color={COLORS.primary} />
-								<Text
-									style={[aiStyles.buttonText, aiStyles.secondaryButtonText]}
-								>
-									Generate Recipe
+							<View style={aiStyles.featureIcon}>
+								<Ionicons name='search' size={18} color={COLORS.white} />
+							</View>
+							<View style={aiStyles.featureCopy}>
+								<Text style={aiStyles.featureTitle}>Identify dish</Text>
+								<Text style={aiStyles.featureSubtitle}>
+									AI guesses the dish name, cuisine, and confidence score.
 								</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				)}
+							</View>
+						</TouchableOpacity>
 
-				{!selectedImage && (
-					<View style={aiStyles.imageContainer}>
-						<View style={aiStyles.imagePlaceholder}>
-							<Ionicons name='image' size={48} color={COLORS.textLight} />
-							<Text style={aiStyles.placeholderText}>
-								No image selected{'\n'}Take a photo or choose from gallery
-							</Text>
-						</View>
+						<TouchableOpacity
+							style={[
+								aiStyles.featureButton,
+								currentFeature === 'generate-recipe' && aiStyles.featureButtonActive,
+								(!selectedImage || isLoading) && aiStyles.featureButtonDisabled,
+							]}
+							onPress={() => processImage('generate-recipe')}
+							disabled={!selectedImage || isLoading}
+						>
+							<View style={aiStyles.featureIcon}>
+								<Ionicons name='restaurant' size={18} color={COLORS.white} />
+							</View>
+							<View style={aiStyles.featureCopy}>
+								<Text style={aiStyles.featureTitle}>Generate recipe</Text>
+								<Text style={aiStyles.featureSubtitle}>
+									ChatGPT-style instructions, ingredients, and save-ready assets.
+								</Text>
+							</View>
+						</TouchableOpacity>
 					</View>
-				)}
-
-				{(selectedImage) && (
-					<TouchableOpacity style={aiStyles.resetButton} onPress={resetScreen}>
-						<Text style={aiStyles.resetButtonText}>Start Over</Text>
-					</TouchableOpacity>
-				)}
+				</View>
 			</ScrollView>
 
-			{/* Bottom Sheet for Results */}
 			<RecipeBottomSheet
 				isVisible={showBottomSheet}
 				isLoading={isLoading}
 				onClose={closeBottomSheet}
-				title={currentFeature === 'identify-dish' ? 'Dish Identification' : 'Recipe Generation'}
+				title={
+					currentFeature === 'identify-dish'
+						? 'Dish Identification'
+						: 'Recipe Generation'
+				}
 			>
 				{isLoading ? (
-					<RecipeLoading 
-						message={currentFeature === 'identify-dish' ? 'Identifying dish...' : 'Generating recipe...'}
+					<RecipeLoading
+						message={
+							currentFeature === 'identify-dish'
+								? 'Identifying dish...'
+								: 'Generating recipe...'
+						}
 					/>
 				) : error ? (
 					<View style={aiStyles.errorContainer}>
@@ -319,7 +353,9 @@ export default function AIScreen() {
 				) : results ? (
 					<RecipeResults
 						results={results}
-						onSaveRecipe={results.type === 'generate-recipe' ? saveRecipe : undefined}
+						onSaveRecipe={
+							results.type === 'generate-recipe' ? saveRecipe : undefined
+						}
 						isSaving={isSaving}
 					/>
 				) : null}

@@ -5,6 +5,7 @@ import {
 	TouchableOpacity,
 	FlatList,
 	RefreshControl,
+	ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState, useCallback } from 'react';
@@ -19,7 +20,6 @@ import { Heart, Filter } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import RecipeCard from '@/components/RecipeCard';
 import NoFavoritesFound from '@/components/NoFavoritesFound';
-import RecipeListSkeleton from '@/components/Skeletons/RecipeListSkeleton';
 import BackgroundWrapper from '@/components/BackgroundWrapper';
 import { Recipe } from '@/types';
 
@@ -98,7 +98,11 @@ const FavoritesScreen = () => {
 				}
 
 				// Combine both types of recipes
-				allRecipes = [...regularFavorites, ...aiRecipes];
+				allRecipes = [...regularFavorites, ...aiRecipes].sort((a, b) => {
+					const weightA = a.source === 'ai' ? 0 : 1;
+					const weightB = b.source === 'ai' ? 0 : 1;
+					return weightA - weightB;
+				});
 				setFavoriteRecipes(allRecipes);
 
 				// Cache the combined favorites
@@ -186,16 +190,12 @@ const FavoritesScreen = () => {
 				statusBarStyle="light-content"
 				overlayOpacity={0.4}
 			>
-				<View style={favoritesStyles.header}>
-					<Text style={[favoritesStyles.title, { color: COLORS.white }]}>Favorites</Text>
-					<TouchableOpacity
-						style={favoritesStyles.logoutButton}
-						onPress={handleSignOut}
-					>
-						<Ionicons name='log-out-outline' size={22} color={COLORS.white} />
-					</TouchableOpacity>
+				<View style={favoritesStyles.loadingWrapper}>
+					<ActivityIndicator size='large' color={COLORS.primary} />
+					<Text style={favoritesStyles.loadingText}>
+						Hang tight, fetching your saved bites...
+					</Text>
 				</View>
-				<RecipeListSkeleton count={6} numColumns={2} />
 			</BackgroundWrapper>
 		);
 	}
@@ -268,6 +268,13 @@ const FavoritesScreen = () => {
 						</Animated.View>
 					</View>
 				)}
+
+				<View style={favoritesStyles.helperRow}>
+					<Ionicons name='color-wand-outline' size={16} color={COLORS.white} />
+					<Text style={favoritesStyles.helperText}>
+						AI-generated dishes sit alongside everything you&apos;ve saved.
+					</Text>
+				</View>
 
 				<View style={favoritesStyles.recipesSection}>
 					<FlatList

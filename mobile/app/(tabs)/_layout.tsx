@@ -46,7 +46,7 @@ const TabsLayout = (): React.ReactElement | null => {
 				options={{
 					title: 'AI',
 					tabBarIcon: ({ color, size }) => (
-						<Ionicons name='camera' size={size} color={color} />
+						<Ionicons name='sparkles-outline' size={size} color={color} />
 					),
 				}}
 			/>
@@ -56,6 +56,15 @@ const TabsLayout = (): React.ReactElement | null => {
 					title: 'Favorites',
 					tabBarIcon: ({ color, size }) => (
 						<Ionicons name='heart' size={size} color={color} />
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name='profile'
+				options={{
+					title: 'Profile',
+					tabBarIcon: ({ color, size }) => (
+						<Ionicons name='person-circle' size={size} color={color} />
 					),
 				}}
 			/>

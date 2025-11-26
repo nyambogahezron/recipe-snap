@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, StatusBar } from 'react-native';
 import { Image } from 'expo-image';
 import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BackgroundWrapperProps {
@@ -13,6 +14,10 @@ interface BackgroundWrapperProps {
 	statusBarStyle?: 'light-content' | 'dark-content';
 	safeAreaTop?: boolean;
 	safeAreaBottom?: boolean;
+	useGradientBackground?: boolean;
+	gradientColors?: string[];
+	gradientStart?: { x: number; y: number };
+	gradientEnd?: { x: number; y: number };
 }
 
 export default function BackgroundWrapper({
@@ -24,23 +29,38 @@ export default function BackgroundWrapper({
 	statusBarStyle = 'light-content',
 	safeAreaTop = true,
 	safeAreaBottom = false,
+	useGradientBackground = true,
+	gradientColors = ['rgba(241, 111, 38, 0.35)', 'rgba(10, 7, 6, 0.9)'],
+	gradientStart = { x: 0, y: 0 },
+	gradientEnd = { x: 1, y: 1 },
 }: BackgroundWrapperProps) {
 	const insets = useSafeAreaInsets();
 
 	return (
 		<View style={styles.container}>
-			<Image
-				source={backgroundImage}
-				style={[styles.backgroundImage, { opacity: 0.7 }]}
-				blurRadius={blurRadius}
-			/>
-			<BlurView 
-				intensity={blurIntensity} 
-				style={[
-					styles.glassOverlay, 
-					{ backgroundColor: `rgba(0, 0, 0, ${overlayOpacity})` }
-				]} 
-			/>
+			{useGradientBackground ? (
+				<LinearGradient
+					colors={gradientColors}
+					start={gradientStart}
+					end={gradientEnd}
+					style={styles.gradientBackground}
+				/>
+			) : (
+				<>
+					<Image
+						source={backgroundImage}
+						style={[styles.backgroundImage, { opacity: 0.7 }]}
+						blurRadius={blurRadius}
+					/>
+					<BlurView
+						intensity={blurIntensity}
+						style={[
+							styles.glassOverlay,
+							{ backgroundColor: `rgba(0, 0, 0, ${overlayOpacity})` },
+						]}
+					/>
+				</>
+			)}
 
 			<StatusBar
 				barStyle={statusBarStyle}
@@ -78,6 +98,13 @@ const styles = StyleSheet.create({
 		height: '100%',
 	},
 	glassOverlay: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+	},
+	gradientBackground: {
 		position: 'absolute',
 		top: 0,
 		left: 0,

@@ -6,6 +6,7 @@ import {
 	TouchableOpacity,
 	FlatList,
 	Alert,
+	ActivityIndicator,
 } from 'react-native';
 import { MealAPI, TransformedMeal } from '@/services/mealAPI';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -16,11 +17,37 @@ import { Search, Filter, Sparkles, Globe } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import RecipeCard from '@/components/RecipeCard';
 import AIRecipeCard from '@/components/AIRecipeCard';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import SearchScreenSkeleton from '@/components/Skeletons/SearchScreenSkeleton';
 import BackgroundWrapper from '@/components/BackgroundWrapper';
 import { aiService } from '@/services/ai/aiService';
 import { SearchResult } from '@/types/index';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const curatedPrompts = [
+	{
+		label: '15-min meals',
+		value: 'Quick dinner ideas under 15 minutes',
+		type: 'api' as const,
+		icon: 'flash-outline' as const,
+	},
+	{
+		label: 'Plant-based AI',
+		value: 'Plant-based high protein dinner plan',
+		type: 'ai' as const,
+		icon: 'leaf-outline' as const,
+	},
+	{
+		label: 'Comfort food',
+		value: 'Cozy comfort food classics',
+		type: 'api' as const,
+		icon: 'restaurant-outline' as const,
+	},
+	{
+		label: 'Chef mode',
+		value: 'Create a gourmet tasting menu',
+		type: 'ai' as const,
+		icon: 'color-wand-outline' as const,
+	},
+];
 
 const SearchScreen = () => {
 	const [searchQuery, setSearchQuery] = useState('');
@@ -29,6 +56,7 @@ const SearchScreen = () => {
 	const [loading, setLoading] = useState(false);
 	const [initialLoading, setInitialLoading] = useState(true);
 	const [searchType, setSearchType] = useState<'api' | 'ai'>('api');
+	const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
 	const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
@@ -120,6 +148,17 @@ const SearchScreen = () => {
 					setAIRecipes(results);
 					setRecipes([]);
 				}
+
+				const normalizedQuery = debouncedSearchQuery.trim();
+				if (normalizedQuery) {
+					setRecentSearches((prev) => {
+						const next = [
+							normalizedQuery,
+							...prev.filter((item) => item !== normalizedQuery),
+						];
+						return next.slice(0, 5);
+					});
+				}
 			} catch (error) {
 				console.error('Error searching:', error);
 				if (searchType === 'api') {
@@ -135,7 +174,27 @@ const SearchScreen = () => {
 		handleSearch();
 	}, [debouncedSearchQuery, initialLoading, searchType, performAISearch]);
 
-	if (initialLoading) return <SearchScreenSkeleton />;
+	const handlePromptPress = (prompt: (typeof curatedPrompts)[number]) => {
+		setSearchType(prompt.type);
+		setSearchQuery(prompt.value);
+	};
+
+	const heroSubtitle =
+		searchType === 'ai'
+			? 'Let Bite AI remix your pantry into something special.'
+			: 'Browse the Bite library and save the meals you love.';
+
+	if (initialLoading)
+		return (
+			<BackgroundWrapper statusBarStyle='light-content' overlayOpacity={0.4}>
+				<View style={searchStyles.loadingState}>
+					<ActivityIndicator size='large' color={COLORS.primary} />
+					<Text style={searchStyles.loadingStateText}>
+						Booting up personalized results...
+					</Text>
+				</View>
+			</BackgroundWrapper>
+		);
 
 	return (
 		<BackgroundWrapper
@@ -175,6 +234,63 @@ const SearchScreen = () => {
 				</TouchableOpacity>
 			</Animated.View>
 
+			<View style={searchStyles.heroWrapper}>
+				<LinearGradient
+					colors={['rgba(255,255,255,0.08)', 'rgba(0,0,0,0.35)']}
+					start={{ x: 0, y: 0 }}
+					end={{ x: 1, y: 1 }}
+					style={searchStyles.heroCard}
+				>
+					<View style={searchStyles.heroTextGroup}>
+						<Text style={searchStyles.heroEyebrow}>
+							{searchType === 'ai' ? 'AI assistant' : 'Curated catalog'}
+						</Text>
+						<Text style={searchStyles.heroTitle}>
+							Find tonight&apos;s inspiration
+						</Text>
+						<Text style={searchStyles.heroSubtitle}>{heroSubtitle}</Text>
+					</View>
+					<View style={searchStyles.heroButtons}>
+						<TouchableOpacity
+							style={[
+								searchStyles.heroButton,
+								searchType === 'api' && searchStyles.heroButtonActive,
+							]}
+							onPress={() => setSearchType('api')}
+						>
+							<Globe size={16} color={COLORS.white} />
+							<Text style={searchStyles.heroButtonText}>Browse recipes</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							style={[
+								searchStyles.heroButton,
+								searchType === 'ai' && searchStyles.heroButtonActive,
+							]}
+							onPress={() => setSearchType('ai')}
+						>
+							<Sparkles size={16} color={COLORS.white} />
+							<Text style={searchStyles.heroButtonText}>Ask AI</Text>
+						</TouchableOpacity>
+					</View>
+				</LinearGradient>
+			</View>
+
+			<View style={searchStyles.promptsContainer}>
+				{curatedPrompts.map((prompt) => (
+					<TouchableOpacity
+						key={prompt.label}
+						style={[
+							searchStyles.promptChip,
+							searchType === prompt.type && searchStyles.promptChipActive,
+						]}
+						onPress={() => handlePromptPress(prompt)}
+					>
+						<Ionicons name={prompt.icon} size={14} color={COLORS.white} />
+						<Text style={searchStyles.promptChipText}>{prompt.label}</Text>
+					</TouchableOpacity>
+				))}
+			</View>
+
 			{/* Search Type Toggle */}
 			<View style={searchStyles.searchTypeToggle}>
 				<TouchableOpacity
@@ -213,6 +329,23 @@ const SearchScreen = () => {
 				</TouchableOpacity>
 			</View>
 
+			{recentSearches.length > 0 && (
+				<View style={searchStyles.recentContainer}>
+					<Text style={searchStyles.recentLabel}>Recent searches</Text>
+					<View style={searchStyles.recentChips}>
+						{recentSearches.map((term) => (
+							<TouchableOpacity
+								key={term}
+								style={searchStyles.recentChip}
+								onPress={() => setSearchQuery(term)}
+							>
+								<Text style={searchStyles.recentChipText}>{term}</Text>
+							</TouchableOpacity>
+						))}
+					</View>
+				</View>
+			)}
+
 			<View style={searchStyles.resultsSection}>
 				<View style={searchStyles.resultsHeader}>
 					<Text style={searchStyles.resultsTitle}>
@@ -225,10 +358,12 @@ const SearchScreen = () => {
 
 				{loading ? (
 					<View style={searchStyles.loadingContainer}>
-						<LoadingSpinner 
-							message={searchType === 'api' ? 'Searching recipes...' : 'Generating AI suggestions...'} 
-							size='small' 
-						/>
+						<ActivityIndicator size='large' color={COLORS.primary} />
+						<Text style={searchStyles.loadingText}>
+							{searchType === 'api'
+								? 'Searching the Bite library...'
+								: 'Asking Bite AI for ideas...'}
+						</Text>
 					</View>
 				) : searchType === 'api' ? (
 					<FlatList
