@@ -1,5 +1,5 @@
 {
-  "name": "api",
+  "name": "bite-api",
   "version": "0.0.1",
   "main": "dist/server.js",
   "scripts": {
