@@ -10,59 +10,14 @@ export const homeStyles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: COLORS.background,
 	},
-	modernHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		paddingHorizontal: 20,
-		paddingVertical: 12,
-		backgroundColor: 'transparent',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.05,
-		shadowRadius: 4,
-		elevation: 2,
-	},
-	searchContainer: {
-		flex: 1,
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: COLORS.gray,
-		borderRadius: 12,
-		paddingHorizontal: 12,
-		
-	},
-	searchIcon: {
-		marginRight: 8,
-	},
-	searchInput: {
-		flex: 1,
-		paddingVertical: 14,
-		fontSize: 16,
-		color: COLORS.text,
-		fontFamily: FONTS.regular,
-	},
-	iconButton: {
-		width: 40,
-		height: 40,
-		backgroundColor: COLORS.gray,
-		borderRadius: 12,
-		justifyContent: 'center',
-		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
-		elevation: 2,
-	},
 	scrollContent: {
 		paddingBottom: 32,
 	},
 	parallaxHeader: {
-		paddingBottom: 24,
-		paddingTop: 8,
+		paddingBottom: 4,
+		paddingTop: 0,
 	},
 	stickyCategoryWrapper: {
-		backgroundColor: COLORS.background,
 		paddingBottom: 12,
 		paddingTop: 4,
 		borderBottomWidth: StyleSheet.hairlineWidth,
@@ -83,11 +38,10 @@ export const homeStyles = StyleSheet.create({
 		letterSpacing: -0.5,
 	},
 	featuredSection: {
-		paddingHorizontal: 20,
-		marginBottom: 24,
+		marginBottom: 4,
 	},
 	featuredCard: {
-		borderRadius: 24,
+		borderRadius: 4,
 		overflow: 'hidden',
 		backgroundColor: COLORS.card,
 		shadowColor: COLORS.shadow,
@@ -191,7 +145,7 @@ export const homeStyles = StyleSheet.create({
 		fontFamily: FONTS.regular,
 	},
 	categoryFilterContainer: {
-		marginVertical: 16,
+		marginVertical: 10,
 	},
 	categoryFilterScrollContent: {
 		paddingHorizontal: 16,
@@ -239,7 +193,7 @@ export const homeStyles = StyleSheet.create({
 export const recipeCardStyles = StyleSheet.create({
 	container: {
 		width: cardWidth,
-		backgroundColor: COLORS.card,
+		backgroundColor: COLORS.background,
 		borderRadius: 16,
 		marginBottom: 16,
 		shadowColor: COLORS.shadow,
@@ -293,7 +247,7 @@ export const recipeCardStyles = StyleSheet.create({
 	},
 	description: {
 		fontSize: 12,
-		color: COLORS.textLight,
+		color: COLORS.white,
 		marginBottom: 8,
 		lineHeight: 16,
 		fontFamily: FONTS.regular,
@@ -309,7 +263,7 @@ export const recipeCardStyles = StyleSheet.create({
 	},
 	timeText: {
 		fontSize: 11,
-		color: COLORS.textLight,
+		color: COLORS.white,
 		marginLeft: 4,
 		fontFamily: FONTS.medium,
 	},
@@ -319,7 +273,7 @@ export const recipeCardStyles = StyleSheet.create({
 	},
 	servingsText: {
 		fontSize: 11,
-		color: COLORS.textLight,
+		color: COLORS.white,
 		marginLeft: 4,
 		fontFamily: FONTS.medium,
 	},

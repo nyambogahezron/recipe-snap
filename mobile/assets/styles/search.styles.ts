@@ -5,7 +5,6 @@ import { FONTS } from '@/constants/fonts';
 export const searchStyles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: COLORS.background,
 	},
 	loadingState: {
 		flex: 1,
@@ -23,28 +22,8 @@ export const searchStyles = StyleSheet.create({
 	modernHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		paddingHorizontal: 20,
-		paddingVertical: 12,
-		backgroundColor: COLORS.background,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.05,
-		shadowRadius: 4,
-		elevation: 2,
-	},
-	iconButton: {
-		width: 48,
-		height: 48,
-		backgroundColor: COLORS.card,
-		borderRadius: 12,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginLeft: 12,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
-		elevation: 2,
+		paddingHorizontal: 5,
+		paddingVertical: 10,
 	},
 	searchSection: {
 		paddingHorizontal: 16,
@@ -54,18 +33,13 @@ export const searchStyles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: COLORS.card,
+		backgroundColor: COLORS.background,
 		borderRadius: 12,
-		paddingHorizontal: 12,
-		paddingVertical: 14,
-		elevation: 2,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
+		paddingHorizontal: 10,
+		paddingVertical: 10,
 	},
 	searchIcon: {
-		marginRight: 8,
+		marginRight: 5,
 	},
 	searchInput: {
 		flex: 1,
@@ -76,50 +50,15 @@ export const searchStyles = StyleSheet.create({
 	clearButton: {
 		padding: 4,
 	},
-	quickFilters: {
-		marginTop: 20,
-	},
-	filterLabel: {
-		fontSize: 16,
-		fontFamily: FONTS.semibold,
-		color: COLORS.text,
-		marginBottom: 12,
-	},
-	filterButtons: {
-		flexDirection: 'row',
-		gap: 12,
-	},
-	quickFilterButton: {
-		backgroundColor: COLORS.card,
-		paddingHorizontal: 16,
-		paddingVertical: 8,
-		borderRadius: 20,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-	activeQuickFilter: {
-		backgroundColor: COLORS.primary,
-		borderColor: COLORS.primary,
-	},
-	quickFilterText: {
-		fontSize: 14,
-		fontFamily: FONTS.medium,
-		color: COLORS.text,
-	},
-	activeQuickFilterText: {
-		color: COLORS.white,
-	},
 	resultsSection: {
 		flex: 1,
 		paddingHorizontal: 16,
-		marginTop: 8,
 	},
 	resultsHeader: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		marginBottom: 16,
-		marginTop: 16,
 	},
 	resultsTitle: {
 		fontSize: 18,
@@ -211,88 +150,7 @@ export const searchStyles = StyleSheet.create({
 		color: COLORS.white,
 		fontFamily: FONTS.semibold,
 	},
-	heroWrapper: {
-		paddingHorizontal: 20,
-		paddingTop: 12,
-	},
-	heroCard: {
-		borderRadius: 24,
-		padding: 20,
-		borderWidth: 1,
-		borderColor: 'rgba(255,255,255,0.1)',
-	},
-	heroTextGroup: {
-		rowGap: 8,
-	},
-	heroEyebrow: {
-		fontSize: 12,
-		textTransform: 'uppercase',
-		letterSpacing: 1,
-		color: 'rgba(255,255,255,0.7)',
-		fontFamily: FONTS.semibold,
-	},
-	heroTitle: {
-		fontSize: 26,
-		fontFamily: FONTS.extrabold,
-		color: COLORS.white,
-	},
-	heroSubtitle: {
-		color: 'rgba(255,255,255,0.8)',
-		fontFamily: FONTS.regular,
-		fontSize: 14,
-		lineHeight: 20,
-	},
-	heroButtons: {
-		flexDirection: 'row',
-		columnGap: 12,
-		marginTop: 16,
-	},
-	heroButton: {
-		flex: 1,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		columnGap: 8,
-		borderRadius: 16,
-		paddingVertical: 12,
-		borderWidth: 1,
-		borderColor: 'rgba(255,255,255,0.2)',
-	},
-	heroButtonActive: {
-		backgroundColor: 'rgba(0,0,0,0.4)',
-		borderColor: COLORS.primary,
-	},
-	heroButtonText: {
-		color: COLORS.white,
-		fontFamily: FONTS.semibold,
-	},
-	promptsContainer: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		gap: 12,
-		paddingHorizontal: 20,
-		paddingTop: 12,
-	},
-	promptChip: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		columnGap: 6,
-		paddingHorizontal: 14,
-		paddingVertical: 8,
-		borderRadius: 999,
-		borderWidth: 1,
-		borderColor: 'rgba(255,255,255,0.2)',
-		backgroundColor: 'rgba(0,0,0,0.25)',
-	},
-	promptChipActive: {
-		borderColor: COLORS.primary,
-		backgroundColor: 'rgba(255,255,255,0.15)',
-	},
-	promptChipText: {
-		color: COLORS.white,
-		fontFamily: FONTS.medium,
-		fontSize: 13,
-	},
+
 	recentContainer: {
 		paddingHorizontal: 20,
 		paddingTop: 12,

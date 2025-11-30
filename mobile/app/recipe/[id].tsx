@@ -307,20 +307,6 @@ const RecipeDetailScreen = () => {
 										<Text style={recipeDetailStyles.instructionText}>
 											{instruction}
 										</Text>
-										<View style={recipeDetailStyles.instructionFooter}>
-											<Text style={recipeDetailStyles.stepLabel}>
-												Step {index + 1}
-											</Text>
-											<TouchableOpacity
-												style={recipeDetailStyles.completeButton}
-											>
-												<Ionicons
-													name='checkmark'
-													size={16}
-													color={COLORS.primary}
-												/>
-											</TouchableOpacity>
-										</View>
 									</View>
 								</View>
 							))}
@@ -343,6 +329,7 @@ const RecipeDetailScreen = () => {
 						</LinearGradient>
 					</TouchableOpacity>
 				</View>
+				<View style={{ height: 32 }} />
 			</ScrollView>
 		</View>
 	);

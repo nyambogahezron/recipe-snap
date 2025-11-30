@@ -42,6 +42,15 @@ const TabsLayout = (): React.ReactElement | null => {
 				}}
 			/>
 			<Tabs.Screen
+				name='search'
+				options={{
+					title: 'Recipes',
+					tabBarIcon: ({ color, size }) => (
+						<Ionicons name='search' size={size} color={color} />
+					),
+				}}
+			/>
+			<Tabs.Screen
 				name='ai'
 				options={{
 					title: 'AI',

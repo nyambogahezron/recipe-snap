@@ -93,7 +93,7 @@ export default function RecipeCard({
 							<Ionicons
 								name='time-outline'
 								size={14}
-								color={COLORS.textLight}
+								color={COLORS.accent}
 							/>
 							<Text style={recipeCardStyles.timeText}>{recipe.cookTime}</Text>
 						</View>
@@ -103,7 +103,7 @@ export default function RecipeCard({
 							<Ionicons
 								name='people-outline'
 								size={14}
-								color={COLORS.textLight}
+								color={COLORS.accent}
 							/>
 							<Text style={recipeCardStyles.servingsText}>
 								{recipe.servings}

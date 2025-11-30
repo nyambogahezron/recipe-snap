@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(21,21,21,0.6)',
   },
   backdropPressable: {
     flex: 1,
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     height: screenHeight,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.background,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     shadowColor: '#000',
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: COLORS.border,
   },
   title: {
     fontSize: 20,

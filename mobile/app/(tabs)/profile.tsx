@@ -12,22 +12,19 @@ import Animated, {
 	FadeInUp,
 	ZoomIn,
 } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import SafeScreen from '@/components/SafeScreen';
 import RecipeBottomSheet from '@/components/RecipeBottomSheet';
 import { profileStyles } from '@/assets/styles/profile.styles';
 import { COLORS } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import toast from '@/services/toastService';
+import BackgroundWrapper from '@/components/BackgroundWrapper';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const normalizeDate = (
-	value?: Date | number | string | null
-): Date | null => {
+const normalizeDate = (value?: Date | number | string | null): Date | null => {
 	if (!value) return null;
 	if (value instanceof Date) return value;
 
@@ -48,9 +45,7 @@ const normalizeDate = (
 	return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
-const getRelativeTime = (
-	value?: Date | number | string | null
-): string => {
+const getRelativeTime = (value?: Date | number | string | null): string => {
 	const date = normalizeDate(value);
 	if (!date) return 'Never updated';
 
@@ -64,9 +59,7 @@ const getRelativeTime = (
 	return `${diffDays}d ago`;
 };
 
-const formatFullDate = (
-	value?: Date | number | string | null
-): string => {
+const formatFullDate = (value?: Date | number | string | null): string => {
 	const date = normalizeDate(value);
 	if (!date) return '—';
 	return date.toLocaleDateString(undefined, {
@@ -83,9 +76,10 @@ const ProfileScreen = (): React.ReactElement | null => {
 	const [isSaving, setIsSaving] = useState(false);
 	const [isSigningOut, setIsSigningOut] = useState(false);
 	const [statusMessage, setStatusMessage] = useState<string | null>(null);
-	const [activeEditField, setActiveEditField] = useState<'name' | 'email' | null>(null);
-	const [draftValue, setDraftValue] = useState('');
-	const [editError, setEditError] = useState<string | null>(null);
+	const [sheetVisible, setSheetVisible] = useState(false);
+	const [draftName, setDraftName] = useState('');
+	const [draftEmail, setDraftEmail] = useState('');
+	const [sheetError, setSheetError] = useState<string | null>(null);
 
 	useEffect(() => {
 		setName(user?.name ?? '');
@@ -121,10 +115,7 @@ const ProfileScreen = (): React.ReactElement | null => {
 		return `${user.id.slice(0, 6)}…${user.id.slice(-4)}`;
 	}, [user?.id]);
 
-	const emailIsValid = useMemo(
-		() => emailRegex.test(email.trim()),
-		[email]
-	);
+	const emailIsValid = useMemo(() => emailRegex.test(email.trim()), [email]);
 
 	const isDirty = useMemo(() => {
 		const baseName = user?.name ?? '';
@@ -179,63 +170,64 @@ const ProfileScreen = (): React.ReactElement | null => {
 			setIsSigningOut(false);
 		}
 	};
-
-	const openEditSheet = (field: 'name' | 'email') => {
-		setEditError(null);
-		setDraftValue(field === 'name' ? name : email);
-		setActiveEditField(field);
+	const openEditSheet = () => {
+		setSheetError(null);
+		setDraftName(name);
+		setDraftEmail(email);
+		setSheetVisible(true);
 	};
 
 	const closeEditSheet = () => {
-		setActiveEditField(null);
-		setDraftValue('');
-		setEditError(null);
+		setSheetVisible(false);
+		setDraftName('');
+		setDraftEmail('');
+		setSheetError(null);
 	};
 
-	const handleApplyDraft = () => {
-		if (!activeEditField) return;
-		const trimmedValue = draftValue.trim();
+	const handleSaveFromSheet = async () => {
+		const trimmedName = draftName.trim();
+		const trimmedEmail = draftEmail.trim();
 
-		if (activeEditField === 'name') {
-			if (trimmedValue.length < 2) {
-				setEditError('Please enter at least 2 characters.');
-				return;
-			}
-			setName(trimmedValue);
-		} else {
-			if (!emailRegex.test(trimmedValue)) {
-				setEditError('Enter a valid email address.');
-				return;
-			}
-			setEmail(trimmedValue);
+		if (trimmedName.length < 2) {
+			setSheetError('Please enter at least 2 characters for name.');
+			return;
+		}
+		if (!emailRegex.test(trimmedEmail)) {
+			setSheetError('Please enter a valid email address.');
+			return;
 		}
 
-		setStatusMessage('Draft ready — tap Save changes');
-		closeEditSheet();
+		try {
+			setIsSaving(true);
+			const result = await updateProfile({ name: trimmedName, email: trimmedEmail });
+
+			if (result.success) {
+				setName(trimmedName);
+				setEmail(trimmedEmail);
+				toast.success('Profile updated', 'Your info is now synced.');
+				setStatusMessage('Changes synced just now');
+				closeEditSheet();
+			} else {
+				setSheetError(result.error ?? 'Update failed — please try again.');
+			}
+		} catch (error) {
+			setSheetError(error instanceof Error ? error.message : 'Unexpected error');
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
-	const sheetTitle =
-		activeEditField === 'name'
-			? 'Update full name'
-			: activeEditField === 'email'
-			? 'Update email address'
-			: '';
-
-	const sheetPlaceholder =
-		activeEditField === 'name' ? 'Enter your full name' : 'name@biteapp.io';
-
-	const stats = [
-		{ label: 'Member since', value: memberSince },
-		{ label: 'Last updated', value: lastUpdatedRelative },
-		{ label: 'Account ID', value: userIdPreview },
-	];
+	// Unified sheet - placeholders and title handled inline
 
 	if (!user) return null;
 
 	return (
-		<SafeScreen>
+		<BackgroundWrapper statusBarStyle='light-content' overlayOpacity={0.4}>
 			<AnimatedScrollView
-				contentContainerStyle={[profileStyles.container, profileStyles.scrollContent]}
+				contentContainerStyle={[
+					profileStyles.container,
+					profileStyles.scrollContent,
+				]}
 				showsVerticalScrollIndicator={false}
 				keyboardShouldPersistTaps='handled'
 			>
@@ -243,13 +235,6 @@ const ProfileScreen = (): React.ReactElement | null => {
 					style={profileStyles.heroCard}
 					entering={FadeInDown.duration(600).springify()}
 				>
-					<LinearGradient
-						colors={['rgba(241, 111, 38, 0.35)', 'rgba(10, 7, 6, 0.9)']}
-						start={{ x: 0, y: 0 }}
-						end={{ x: 1, y: 1 }}
-						style={profileStyles.heroGradient}
-					/>
-
 					<View style={profileStyles.heroContent}>
 						<View
 							style={{
@@ -296,34 +281,6 @@ const ProfileScreen = (): React.ReactElement | null => {
 
 				<Animated.View
 					style={profileStyles.card}
-					entering={FadeInUp.delay(100).duration(500)}
-				>
-					<View style={profileStyles.cardHeader}>
-						<View>
-							<Text style={profileStyles.cardTitle}>Account insights</Text>
-							<Text style={profileStyles.cardSubtitle}>
-								Your identity at a glance
-							</Text>
-						</View>
-						<Ionicons name='pulse-outline' size={22} color={COLORS.primary} />
-					</View>
-
-					<View style={profileStyles.statsGrid}>
-						{stats.map((stat, index) => (
-							<Animated.View
-								key={stat.label}
-								entering={FadeInDown.delay(200 + index * 80).duration(450)}
-								style={profileStyles.statCard}
-							>
-								<Text style={profileStyles.statLabel}>{stat.label}</Text>
-								<Text style={profileStyles.statValue}>{stat.value}</Text>
-							</Animated.View>
-						))}
-					</View>
-				</Animated.View>
-
-				<Animated.View
-					style={profileStyles.card}
 					entering={FadeInUp.delay(180).duration(500)}
 				>
 					<View style={profileStyles.cardHeader}>
@@ -333,11 +290,9 @@ const ProfileScreen = (): React.ReactElement | null => {
 								Update your personal info anytime
 							</Text>
 						</View>
-						<Ionicons
-							name='create-outline'
-							size={20}
-							color={COLORS.primary}
-						/>
+						<TouchableOpacity onPress={openEditSheet} style={{padding:6}}>
+							<Ionicons name='create-outline' size={20} color={COLORS.primary} />
+						</TouchableOpacity>
 					</View>
 
 					<View style={profileStyles.editRow}>
@@ -347,27 +302,17 @@ const ProfileScreen = (): React.ReactElement | null => {
 								{name.trim() || 'Add your name'}
 							</Text>
 						</View>
-						<TouchableOpacity
-							style={profileStyles.editPill}
-							onPress={() => openEditSheet('name')}
-						>
-							<Ionicons name='create-outline' size={16} color={COLORS.white} />
-							<Text style={profileStyles.editPillText}>Edit</Text>
-						</TouchableOpacity>
+						{/* Single edit entry now available via header Edit button */}
 					</View>
 
 					<View style={profileStyles.editRow}>
 						<View style={{ flex: 1 }}>
 							<Text style={profileStyles.fieldLabel}>Email address</Text>
-							<Text style={profileStyles.fieldValue}>{email || 'Add email'}</Text>
+							<Text style={profileStyles.fieldValue}>
+								{email || 'Add email'}
+							</Text>
 						</View>
-						<TouchableOpacity
-							style={profileStyles.editPill}
-							onPress={() => openEditSheet('email')}
-						>
-							<Ionicons name='mail-outline' size={16} color={COLORS.white} />
-							<Text style={profileStyles.editPillText}>Edit</Text>
-						</TouchableOpacity>
+						{/* Single edit entry now available via header Edit button */}
 					</View>
 
 					{!emailIsValid && email.length > 0 && (
@@ -390,79 +335,73 @@ const ProfileScreen = (): React.ReactElement | null => {
 								<Text style={profileStyles.buttonText}>Sign out</Text>
 							)}
 						</TouchableOpacity>
-						<TouchableOpacity
-							style={[
-								profileStyles.button,
-								profileStyles.primaryButton,
-								!canSave && { opacity: 0.5 },
-							]}
-							onPress={handleUpdateProfile}
-							disabled={!canSave}
-						>
-							{isSaving ? (
-								<ActivityIndicator color={COLORS.white} />
-							) : (
-								<Text style={profileStyles.buttonText}>Save changes</Text>
-							)}
-						</TouchableOpacity>
 					</View>
 
-					<Text style={profileStyles.formFooterText}>
-						Edits happen in bottom sheets so you can focus field-by-field, then
-						use Save changes to sync them securely.
-					</Text>
+					{/* app version and development info */}
 				</Animated.View>
 			</AnimatedScrollView>
+			<View style={profileStyles.appInfo}>
+				<Text style={profileStyles.appInfoText}>
+					Bite v1.0.0 
+				</Text>
+			</View>
 
 			<RecipeBottomSheet
-				isVisible={Boolean(activeEditField)}
-				isLoading={false}
+				isVisible={sheetVisible}
+				isLoading={isSaving}
 				onClose={closeEditSheet}
-				title={sheetTitle}
+				title={'Edit profile'}
 			>
 				<View style={profileStyles.sheetContent}>
-					<Text style={profileStyles.sheetLabel}>
-						{activeEditField === 'name' ? 'Full name' : 'Email address'}
-					</Text>
+					<Text style={profileStyles.sheetLabel}>Full name</Text>
 					<TextInput
-						value={draftValue}
-						onChangeText={setDraftValue}
-						placeholder={sheetPlaceholder}
+						value={draftName}
+						onChangeText={setDraftName}
+						placeholder={'Enter your full name'}
+						placeholderTextColor='rgba(0,0,0,0.4)'
+						style={[profileStyles.sheetInput]}
+						autoCapitalize={'words'}
+						keyboardType={'default'}
+					/>
+
+					<Text style={[profileStyles.sheetLabel, { marginTop: 12 }]}>Email address</Text>
+					<TextInput
+						value={draftEmail}
+						onChangeText={setDraftEmail}
+						placeholder={'name@biteapp.io'}
 						placeholderTextColor='rgba(0,0,0,0.4)'
 						style={[
 							profileStyles.sheetInput,
-							activeEditField === 'email' && !emailRegex.test(draftValue.trim())
+							!emailRegex.test(draftEmail.trim()) && draftEmail.length > 0
 								? { borderColor: 'rgba(255,87,87,0.4)' }
 								: null,
 						]}
-						autoCapitalize={activeEditField === 'email' ? 'none' : 'words'}
-						keyboardType={
-							activeEditField === 'email' ? 'email-address' : 'default'
-						}
+						autoCapitalize={'none'}
+						keyboardType={'email-address'}
 					/>
-					{editError && (
-						<Text style={profileStyles.sheetError}>{editError}</Text>
-					)}
+
+					{sheetError && <Text style={profileStyles.sheetError}>{sheetError}</Text>}
 
 					<View style={profileStyles.sheetActions}>
 						<TouchableOpacity
 							style={[profileStyles.sheetButton, profileStyles.sheetGhostButton]}
 							onPress={closeEditSheet}
+							disabled={isSaving}
 						>
 							<Text style={profileStyles.sheetButtonText}>Cancel</Text>
 						</TouchableOpacity>
 						<TouchableOpacity
 							style={[profileStyles.sheetButton, profileStyles.sheetPrimaryButton]}
-							onPress={handleApplyDraft}
+							onPress={handleSaveFromSheet}
+							disabled={isSaving}
 						>
-							<Text style={profileStyles.sheetButtonText}>Apply</Text>
+							<Text style={profileStyles.sheetButtonText}>{isSaving ? 'Saving…' : 'Save'}</Text>
 						</TouchableOpacity>
 					</View>
 				</View>
 			</RecipeBottomSheet>
-		</SafeScreen>
+		</BackgroundWrapper>
 	);
 };
 
 export default ProfileScreen;
-

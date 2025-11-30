@@ -13,13 +13,9 @@ export const profileStyles = StyleSheet.create({
 		paddingBottom: 56,
 	},
 	heroCard: {
-		borderRadius: 32,
-		padding: 24,
+		padding: 8,
 		overflow: 'hidden',
-		marginBottom: 24,
-		borderWidth: 1,
-		borderColor: 'rgba(255,255,255,0.12)',
-		backgroundColor: 'rgba(7, 5, 5, 0.4)',
+		marginBottom: 20,
 	},
 	heroGradient: {
 		...StyleSheet.absoluteFillObject,
@@ -32,8 +28,8 @@ export const profileStyles = StyleSheet.create({
 		height: 88,
 		borderRadius: 24,
 		borderWidth: 1,
-		borderColor: 'rgba(255,255,255,0.4)',
-		backgroundColor: 'rgba(255,255,255,0.15)',
+		borderColor: 'rgba(255,255,255,0.12)',
+		backgroundColor: 'rgba(7, 5, 5, 0.4)',
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
@@ -75,11 +71,7 @@ export const profileStyles = StyleSheet.create({
 		color: COLORS.white,
 	},
 	card: {
-		borderRadius: 24,
-		padding: 20,
-		backgroundColor: 'rgba(255,255,255,0.08)',
-		borderWidth: 1,
-		borderColor: 'rgba(255,255,255,0.1)',
+		padding: 10,
 		marginBottom: 20,
 	},
 	cardHeader: {
@@ -267,6 +259,23 @@ export const profileStyles = StyleSheet.create({
 		fontFamily: FONTS.bold,
 		color: COLORS.white,
 		fontSize: 15,
+	},
+
+	appInfoText: {
+		fontSize: 13,
+		fontFamily: FONTS.medium,
+		color: 'rgba(255,255,255,0.6)',
+		marginBottom: 6,
+	},
+	appInfoLink: {
+		fontSize: 13,
+		fontFamily: FONTS.medium,
+		color: COLORS.primary,
+		textDecorationLine: 'underline',
+	},
+	appInfo: {
+		marginTop: 12,
+		alignItems: 'center',
 	},
 });
 

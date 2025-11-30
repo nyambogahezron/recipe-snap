@@ -183,31 +183,6 @@ const HomeScreen = (): React.ReactElement => {
 				scrollEventThrottle={16}
 			>
 				<Animated.View style={[homeStyles.parallaxHeader, parallaxHeaderStyle]}>
-					<Animated.View
-						style={homeStyles.modernHeader}
-						entering={FadeInDown.duration(600)}
-					>
-						<TouchableOpacity
-							style={homeStyles.searchContainer}
-							activeOpacity={0.8}
-							onPress={() => router.push('/search')}
-						>
-							<Search
-								size={20}
-								color={COLORS.white}
-								style={homeStyles.searchIcon}
-							/>
-							<Text
-								style={[
-									homeStyles.searchInput,
-									{ color: 'rgba(255, 255, 255, 0.7)' },
-								]}
-							>
-								Search recipes...
-							</Text>
-						</TouchableOpacity>
-					</Animated.View>
-
 				{/* FEATURED SECTION */}
 				{featuredRecipe && (
 					<Animated.View

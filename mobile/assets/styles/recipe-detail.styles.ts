@@ -7,6 +7,7 @@ const { height } = Dimensions.get('window');
 export const recipeDetailStyles = StyleSheet.create({
 	container: {
 		flex: 1,
+		position: 'relative',
 		backgroundColor: COLORS.background,
 	},
 	headerContainer: {
@@ -104,7 +105,7 @@ export const recipeDetailStyles = StyleSheet.create({
 	},
 	statCard: {
 		flex: 1,
-		backgroundColor: COLORS.card,
+		backgroundColor: COLORS.background,
 		borderRadius: 20,
 		padding: 20,
 		alignItems: 'center',
@@ -172,7 +173,7 @@ export const recipeDetailStyles = StyleSheet.create({
 		height: 220,
 		borderRadius: 20,
 		overflow: 'hidden',
-		backgroundColor: COLORS.card,
+		backgroundColor: COLORS.background,
 	},
 	webview: {
 		flex: 1,
@@ -183,8 +184,8 @@ export const recipeDetailStyles = StyleSheet.create({
 	ingredientCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: COLORS.card,
-		padding: 16,
+		backgroundColor: COLORS.background,
+		padding: 4,
 		borderRadius: 16,
 		gap: 12,
 	},
@@ -216,21 +217,21 @@ export const recipeDetailStyles = StyleSheet.create({
 	},
 	instructionCard: {
 		flexDirection: 'row',
-		backgroundColor: COLORS.card,
+		backgroundColor: COLORS.background,
 		borderRadius: 20,
-		padding: 20,
+		padding: 10,
 		gap: 16,
 	},
 	stepIndicator: {
-		width: 40,
-		height: 40,
-		borderRadius: 20,
+		width: 30,
+		height: 30,
+		borderRadius: 15,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
 	stepNumber: {
 		color: COLORS.white,
-		fontSize: 16,
+		fontSize: 14,
 		fontFamily: FONTS.bold,
 	},
 	instructionContent: {
@@ -240,26 +241,8 @@ export const recipeDetailStyles = StyleSheet.create({
 		fontSize: 16,
 		color: COLORS.text,
 		lineHeight: 24,
-		marginBottom: 12,
+		marginBottom: 10,
 		fontFamily: FONTS.regular,
-	},
-	instructionFooter: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-	},
-	stepLabel: {
-		fontSize: 12,
-		color: COLORS.textLight,
-		fontFamily: FONTS.medium,
-	},
-	completeButton: {
-		width: 24,
-		height: 24,
-		borderRadius: 12,
-		backgroundColor: COLORS.primary + '20',
-		justifyContent: 'center',
-		alignItems: 'center',
 	},
 
 	primaryButton: {
@@ -287,7 +270,7 @@ export const recipeDetailStyles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: COLORS.card,
+		backgroundColor: COLORS.background,
 		paddingVertical: 16,
 		borderRadius: 16,
 		borderWidth: 2,

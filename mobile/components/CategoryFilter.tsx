@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
-import { Image } from 'expo-image';
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
@@ -87,17 +86,7 @@ export default function CategoryFilter({
 							onPressOut={handlePressOut}
 							entering={FadeInRight.delay(index * 30).duration(300).springify()}
 						>
-							<Animated.View style={animatedImageStyle}>
-								<Image
-									source={{ uri: category.image }}
-									style={[
-										homeStyles.categoryImage,
-										isSelected && homeStyles.selectedCategoryImage,
-									]}
-									contentFit='cover'
-									transition={300}
-								/>
-							</Animated.View>
+							
 							<Text
 								style={[
 									homeStyles.categoryText,
