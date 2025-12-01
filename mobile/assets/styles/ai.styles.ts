@@ -9,18 +9,12 @@ export const aiStyles = StyleSheet.create({
 	},
 	scrollContent: {
 		paddingHorizontal: 20,
-		paddingTop: 28,
-		paddingBottom: 160,
-		gap: 24,
+		paddingTop: 8,
+		paddingBottom: 10,
+		gap: 15,
 	},
-
 	surfaceCard: {
-		backgroundColor: 'rgba(12, 12, 12, 0.8)',
-		borderRadius: 24,
-		padding: 20,
-		borderWidth: 1,
-		borderColor: 'rgba(255,255,255,0.06)',
-		gap: 20,
+		gap: 15,
 	},
 	cardHeader: {
 		gap: 6,
@@ -48,7 +42,7 @@ export const aiStyles = StyleSheet.create({
 		backgroundColor: COLORS.primary,
 		borderRadius: 14,
 		paddingVertical: 14,
-		paddingHorizontal: 16,
+		paddingHorizontal: 10,
 	},
 	ghostButton: {
 		backgroundColor: 'transparent',

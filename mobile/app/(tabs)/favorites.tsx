@@ -2,7 +2,6 @@ import {
 	View,
 	Text,
 	ScrollView,
-	TouchableOpacity,
 	FlatList,
 	RefreshControl,
 	ActivityIndicator,
@@ -15,21 +14,18 @@ import { cacheService } from '@/services/cacheService';
 import { toast } from '@/services/toastService';
 import { favoritesStyles } from '@/assets/styles/favorites.styles';
 import { COLORS } from '@/constants/colors';
-import { Ionicons } from '@expo/vector-icons';
-import { Heart, Filter } from 'lucide-react-native';
+import { Heart } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import RecipeCard from '@/components/RecipeCard';
 import NoFavoritesFound from '@/components/NoFavoritesFound';
 import BackgroundWrapper from '@/components/BackgroundWrapper';
 import { Recipe } from '@/types';
 
-const FavoritesScreen = () => {
-	const { signOut, user } = useAuth();
+export default function FavoritesScreen() {
+	const { user } = useAuth();
 	const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
-	const [regularFavoritesCount, setRegularFavoritesCount] = useState(0);
-	const [aiRecipesCount, setAiRecipesCount] = useState(0);
 
 	const loadFavorites = useCallback(
 		async (fromCache: boolean = true) => {
@@ -67,7 +63,6 @@ const FavoritesScreen = () => {
 					isFavorite: true,
 					source: 'external' as const,
 				}));
-				setRegularFavoritesCount(regularFavorites.length);
 
 				// Load AI recipes from local database
 				const aiRecipesResponse = await aiService.getUserAIRecipes(user.id);
@@ -91,7 +86,6 @@ const FavoritesScreen = () => {
 						isFavorite: true,
 						source: 'ai' as const,
 					}));
-					setAiRecipesCount(aiRecipes.length);
 
 					// Cache AI recipes separately
 					await cacheService.cacheAIRecipes(user.id, aiRecipesResponse.data);
@@ -167,29 +161,10 @@ const FavoritesScreen = () => {
 		},
 		[user?.id]
 	);
-
-	const handleSignOut = () => {
-		toast.confirmDestructive(
-			'Logout',
-			'Are you sure you want to logout?',
-			'Logout',
-			async () => {
-				// Clear user-specific caches
-				if (user?.id) {
-					await cacheService.invalidateUserCaches(user.id);
-				}
-				signOut();
-			}
-		);
-	};
-
 	// Show skeleton loading on initial load
 	if (loading && favoriteRecipes.length === 0) {
 		return (
-			<BackgroundWrapper 
-				statusBarStyle="light-content"
-				overlayOpacity={0.4}
-			>
+			<BackgroundWrapper statusBarStyle='light-content' overlayOpacity={0.4}>
 				<View style={favoritesStyles.loadingWrapper}>
 					<ActivityIndicator size='large' color={COLORS.primary} />
 					<Text style={favoritesStyles.loadingText}>
@@ -201,10 +176,7 @@ const FavoritesScreen = () => {
 	}
 
 	return (
-		<BackgroundWrapper
-			statusBarStyle="light-content"
-			overlayOpacity={0.4}
-		>
+		<BackgroundWrapper statusBarStyle='light-content' overlayOpacity={0.4}>
 			{/* Modern Header */}
 			<Animated.View
 				style={favoritesStyles.modernHeader}
@@ -212,18 +184,9 @@ const FavoritesScreen = () => {
 			>
 				<View style={favoritesStyles.headerLeft}>
 					<Heart size={24} color={COLORS.white} />
-					<Text style={[favoritesStyles.headerTitle, { color: COLORS.white }]}>My Favorites</Text>
-				</View>
-				<View style={favoritesStyles.headerRight}>
-					<TouchableOpacity style={favoritesStyles.iconButton} activeOpacity={0.8}>
-						<Filter size={20} color={COLORS.white} />
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={favoritesStyles.logoutButton}
-						onPress={handleSignOut}
-					>
-						<Ionicons name='log-out-outline' size={22} color={COLORS.white} />
-					</TouchableOpacity>
+					<Text style={[favoritesStyles.headerTitle, { color: COLORS.white }]}>
+						My Favorites
+					</Text>
 				</View>
 			</Animated.View>
 
@@ -238,44 +201,6 @@ const FavoritesScreen = () => {
 					/>
 				}
 			>
-				{/* Stats Section */}
-				{(regularFavoritesCount > 0 || aiRecipesCount > 0) && (
-					<View style={favoritesStyles.statsContainer}>
-						<Animated.View 
-							style={favoritesStyles.statCard}
-							entering={FadeInDown.delay(200).duration(400).springify()}
-						>
-							<Text style={favoritesStyles.statNumber}>
-								{regularFavoritesCount}
-							</Text>
-							<Text style={favoritesStyles.statLabel}>Saved Recipes</Text>
-						</Animated.View>
-						<Animated.View 
-							style={favoritesStyles.statCard}
-							entering={FadeInDown.delay(300).duration(400).springify()}
-						>
-							<Text style={favoritesStyles.statNumber}>{aiRecipesCount}</Text>
-							<Text style={favoritesStyles.statLabel}>AI Recipes</Text>
-						</Animated.View>
-						<Animated.View 
-							style={favoritesStyles.statCard}
-							entering={FadeInDown.delay(400).duration(400).springify()}
-						>
-							<Text style={favoritesStyles.statNumber}>
-								{favoriteRecipes.length}
-							</Text>
-							<Text style={favoritesStyles.statLabel}>Total</Text>
-						</Animated.View>
-					</View>
-				)}
-
-				<View style={favoritesStyles.helperRow}>
-					<Ionicons name='color-wand-outline' size={16} color={COLORS.white} />
-					<Text style={favoritesStyles.helperText}>
-						AI-generated dishes sit alongside everything you&apos;ve saved.
-					</Text>
-				</View>
-
 				<View style={favoritesStyles.recipesSection}>
 					<FlatList
 						data={favoriteRecipes}
@@ -298,4 +223,4 @@ const FavoritesScreen = () => {
 		</BackgroundWrapper>
 	);
 };
-export default FavoritesScreen;
+

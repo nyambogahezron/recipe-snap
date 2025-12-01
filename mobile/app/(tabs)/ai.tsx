@@ -192,7 +192,7 @@ export default function AIScreen() {
 
 			if (saveResponse.success) {
 				toast.success(
-					'Recipe saved successfully! 🎉',
+					'Recipe saved successfully!',
 					'You can find it in your favorites.'
 				);
 
@@ -219,13 +219,6 @@ export default function AIScreen() {
 				showsVerticalScrollIndicator={false}
 			>
 				<View style={aiStyles.surfaceCard}>
-					<View style={aiStyles.cardHeader}>
-						<Text style={aiStyles.cardLabel}>Image Source</Text>
-						<Text style={aiStyles.cardDescription}>
-							Capture a dish live or pull something from your gallery. High quality images lead to richer recipes.
-						</Text>
-					</View>
-
 					<View style={aiStyles.commandRow}>
 						<TouchableOpacity style={aiStyles.primaryButton} onPress={takePhoto}>
 							<Ionicons name='camera' size={18} color={COLORS.white} />
@@ -293,9 +286,7 @@ export default function AIScreen() {
 							</View>
 							<View style={aiStyles.featureCopy}>
 								<Text style={aiStyles.featureTitle}>Identify dish</Text>
-								<Text style={aiStyles.featureSubtitle}>
-									AI guesses the dish name, cuisine, and confidence score.
-								</Text>
+								
 							</View>
 						</TouchableOpacity>
 
@@ -313,9 +304,6 @@ export default function AIScreen() {
 							</View>
 							<View style={aiStyles.featureCopy}>
 								<Text style={aiStyles.featureTitle}>Generate recipe</Text>
-								<Text style={aiStyles.featureSubtitle}>
-									ChatGPT-style instructions, ingredients, and save-ready assets.
-								</Text>
 							</View>
 						</TouchableOpacity>
 					</View>

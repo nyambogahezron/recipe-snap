@@ -106,8 +106,10 @@ const HomeScreen = (): React.ReactElement => {
 
 			setCategories(transformedCategories);
 
-			if (!selectedCategory)
-				setSelectedCategory(transformedCategories[0]?.name || null);
+			// Set initial category only if not set
+			setSelectedCategory(
+				(prev) => prev || transformedCategories[0]?.name || null
+			);
 
 			const transformedMeals = randomMeals
 				.map((meal) => MealAPI.transformMealData(meal))
@@ -122,7 +124,7 @@ const HomeScreen = (): React.ReactElement => {
 		} finally {
 			setLoading(false);
 		}
-	}, [selectedCategory]);
+	}, []);
 
 	const loadCategoryData = useCallback(
 		async (category: string): Promise<void> => {
@@ -153,7 +155,7 @@ const HomeScreen = (): React.ReactElement => {
 
 	useEffect(() => {
 		loadData();
-	}, [loadData]);
+	}, []);
 
 	if (loading && !refreshing)
 		return (

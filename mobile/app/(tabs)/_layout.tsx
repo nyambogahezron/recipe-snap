@@ -6,7 +6,7 @@ import { COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/fonts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const TabsLayout = (): React.ReactElement | null => {
+export default function TabsLayout() {
 	const { isSignedIn, isLoading } = useAuth();
 	const insets = useSafeAreaInsets();
 
@@ -24,7 +24,9 @@ const TabsLayout = (): React.ReactElement | null => {
 					backgroundColor: COLORS.background,
 					paddingBottom: insets.bottom,
 					paddingTop: 8,
-					height: 80,
+					height: 110,
+					borderWidth: 0,
+					borderColor: 'transparent',
 				},
 				tabBarLabelStyle: {
 					fontSize: 12,
@@ -80,4 +82,3 @@ const TabsLayout = (): React.ReactElement | null => {
 		</Tabs>
 	);
 };
-export default TabsLayout;

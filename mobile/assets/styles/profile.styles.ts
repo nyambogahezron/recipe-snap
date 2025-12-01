@@ -7,7 +7,7 @@ const { width } = Dimensions.get('window');
 export const profileStyles = StyleSheet.create({
 	container: {
 		flex: 1,
-		paddingHorizontal: 20,
+		paddingHorizontal: 5,
 	},
 	scrollContent: {
 		paddingBottom: 56,
@@ -122,6 +122,7 @@ export const profileStyles = StyleSheet.create({
 	},
 	buttonRow: {
 		flexDirection: 'row',
+		marginTop: 8,
 		columnGap: 12,
 	},
 	button: {
