@@ -4,7 +4,7 @@ import RecipeBottomSheet from '@/components/RecipeBottomSheet';
 import RecipeLoading from '@/components/RecipeLoading';
 import RecipeResults from '@/components/RecipeResults';
 import { COLORS } from '@/constants/colors';
-import { useAuth } from '@/contexts/AuthContext';
+import { GUEST_USER_ID } from '@/constants/guestUser';
 import { aiService } from '@/services/ai/aiService';
 import { cacheService } from '@/services/cacheService';
 import { toast } from '@/services/toastService';
@@ -35,9 +35,6 @@ export default function AIScreen() {
 	const [error, setError] = useState<string | null>(null);
 	const [showBottomSheet, setShowBottomSheet] = useState(false);
 	const [currentFeature, setCurrentFeature] = useState<AIFeature | null>(null);
-
-	const { user } = useAuth();
-	
 
 	const requestCameraPermissions = async () => {
 		const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -182,7 +179,7 @@ export default function AIScreen() {
 			const recipe = results.data as GenerateRecipeFromImageOutput;
 
 			const saveResponse = await aiService.saveAIRecipe({
-				userId: user?.id || '',
+				userId: GUEST_USER_ID,
 				recipeName: recipe.recipeName,
 				ingredients: recipe.ingredients,
 				instructions: recipe.instructions,
@@ -197,8 +194,8 @@ export default function AIScreen() {
 				);
 
 				// Invalidate AI recipes cache to force refresh
-				await cacheService.invalidateCache('AI_RECIPES', user?.id);
-				await cacheService.invalidateCache('FAVORITES', user?.id);
+				await cacheService.invalidateCache('AI_RECIPES', GUEST_USER_ID);
+				await cacheService.invalidateCache('FAVORITES', GUEST_USER_ID);
 			} else {
 				throw new Error(saveResponse.error || 'Failed to save recipe');
 			}

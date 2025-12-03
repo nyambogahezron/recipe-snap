@@ -1,5 +1,4 @@
 import { AlertProvider } from '@/components/AlertProvider';
-import { AuthProvider } from '@/contexts/AuthContext';
 import { db } from '@/database';
 import migrations from '@/database/drizzle/migrations';
 import {
@@ -27,7 +26,7 @@ SystemUI.setBackgroundColorAsync(COLORS.background);
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+export default function App() {
 	const { success, error } = useMigrations(db, migrations);
 	const [isReady, setIsReady] = useState(false);
 
@@ -72,16 +71,19 @@ export default function RootLayout() {
 
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
-			<AuthProvider>
-				<AlertProvider>
-					<Stack screenOptions={{ headerShown: false }}>
-						<Stack.Screen name='index' options={{ headerShown: false }} />
-						<Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-						<Stack.Screen name='(auth)' options={{ headerShown: false }} />
-						<Stack.Screen name='recipe/[id]' options={{ headerShown: false }} />
-					</Stack>
-				</AlertProvider>
-			</AuthProvider>
+			<AlertProvider>
+				<RootLayout />
+			</AlertProvider>
 		</GestureHandlerRootView>
 	);
 }
+
+export function RootLayout() {
+	return (
+		<Stack screenOptions={{ headerShown: false }}>
+			<Stack.Screen name='index' options={{ headerShown: false }} />
+			<Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+			<Stack.Screen name='recipe/[id]' options={{ headerShown: false }} />
+		</Stack>
+	);
+} 

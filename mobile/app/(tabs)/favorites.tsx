@@ -6,8 +6,8 @@ import {
 	RefreshControl,
 	ActivityIndicator,
 } from 'react-native';
-import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState, useCallback } from 'react';
+import { GUEST_USER_ID } from '@/constants/guestUser';
 import { aiService } from '@/services/ai/aiService';
 import { favoritesService } from '@/database/services';
 import { cacheService } from '@/services/cacheService';
@@ -22,14 +22,13 @@ import BackgroundWrapper from '@/components/BackgroundWrapper';
 import { Recipe } from '@/types';
 
 export default function FavoritesScreen() {
-	const { user } = useAuth();
 	const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
 
 	const loadFavorites = useCallback(
 		async (fromCache: boolean = true) => {
-			if (!user?.id) return;
+			const userId = GUEST_USER_ID;
 
 			try {
 				let allRecipes: Recipe[] = [];
@@ -37,7 +36,7 @@ export default function FavoritesScreen() {
 				// Try to load from cache first if requested
 				if (fromCache) {
 					const cachedFavorites = await cacheService.getCachedFavorites(
-						user.id
+						userId
 					);
 					if (cachedFavorites) {
 						setFavoriteRecipes(cachedFavorites);
@@ -46,8 +45,8 @@ export default function FavoritesScreen() {
 					}
 				}
 
-				// Load regular favorites from local database
-				const favoritesData = await favoritesService.getUserFavorites(user.id);
+					// Load regular favorites from local database
+					const favoritesData = await favoritesService.getUserFavorites(userId);
 				const regularFavorites: Recipe[] = favoritesData.map((favorite) => ({
 					id: favorite.recipeId,
 					title: favorite.title,
@@ -64,8 +63,8 @@ export default function FavoritesScreen() {
 					source: 'external' as const,
 				}));
 
-				// Load AI recipes from local database
-				const aiRecipesResponse = await aiService.getUserAIRecipes(user.id);
+					// Load AI recipes from local database
+					const aiRecipesResponse = await aiService.getUserAIRecipes(userId);
 				let aiRecipes: Recipe[] = [];
 
 				if (aiRecipesResponse.success && aiRecipesResponse.data) {
@@ -87,8 +86,8 @@ export default function FavoritesScreen() {
 						source: 'ai' as const,
 					}));
 
-					// Cache AI recipes separately
-					await cacheService.cacheAIRecipes(user.id, aiRecipesResponse.data);
+						// Cache AI recipes separately
+						await cacheService.cacheAIRecipes(userId, aiRecipesResponse.data);
 				}
 
 				// Combine both types of recipes
@@ -97,22 +96,20 @@ export default function FavoritesScreen() {
 					const weightB = b.source === 'ai' ? 0 : 1;
 					return weightA - weightB;
 				});
-				setFavoriteRecipes(allRecipes);
+					setFavoriteRecipes(allRecipes);
 
-				// Cache the combined favorites
-				await cacheService.cacheFavorites(user.id, allRecipes);
+					// Cache the combined favorites
+					await cacheService.cacheFavorites(userId, allRecipes);
 			} catch (error) {
 				console.error('Error loading favorites:', error);
 				toast.error('Failed to load favorites', 'Please try again later');
 			} finally {
 				setLoading(false);
-				setRefreshing(false);
-			}
-		},
-		[user?.id]
-	);
-
-	useEffect(() => {
+					setRefreshing(false);
+				}
+			},
+			[]
+		);	useEffect(() => {
 		loadFavorites(true);
 	}, [loadFavorites]);
 
@@ -123,14 +120,14 @@ export default function FavoritesScreen() {
 
 	const handleRemoveFromFavorites = useCallback(
 		async (recipe: Recipe) => {
-			if (!user?.id) return;
+			const userId = GUEST_USER_ID;
 
 			try {
 				if (recipe.source === 'ai') {
 					// Remove AI recipe from local database
 					const recipeId =
 						recipe.originalData?.id || parseInt(recipe.id.replace('ai_', ''));
-					const response = await aiService.deleteAIRecipe(user.id, recipeId);
+					const response = await aiService.deleteAIRecipe(userId, recipeId);
 
 					if (response.success) {
 						toast.success(
@@ -142,7 +139,7 @@ export default function FavoritesScreen() {
 					}
 				} else {
 					// Remove external favorite from local database
-					await favoritesService.removeFavorite(user.id, recipe.id);
+					await favoritesService.removeFavorite(userId, recipe.id);
 					toast.success(
 						'Removed from favorites',
 						'Recipe has been removed from your favorites'
@@ -153,13 +150,13 @@ export default function FavoritesScreen() {
 				setFavoriteRecipes((prev) => prev.filter((r) => r.id !== recipe.id));
 
 				// Invalidate cache
-				await cacheService.invalidateCache('FAVORITES', user.id);
+				await cacheService.invalidateCache('FAVORITES', userId);
 			} catch (error) {
 				console.error('Error removing from favorites:', error);
 				toast.error('Failed to remove', 'Please try again later');
 			}
 		},
-		[user?.id]
+		[]
 	);
 	// Show skeleton loading on initial load
 	if (loading && favoriteRecipes.length === 0) {

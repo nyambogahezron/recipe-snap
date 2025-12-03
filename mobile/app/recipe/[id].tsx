@@ -1,7 +1,7 @@
 import { View, Text, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { GUEST_USER_ID } from '@/constants/guestUser';
 import { favoritesService } from '@/database/services';
 import { MealAPI, TransformedMeal } from '@/services/mealAPI';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -25,13 +25,11 @@ const RecipeDetailScreen = () => {
 	const [isSaved, setIsSaved] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 
-	const { user } = useAuth();
-	const userId = user?.id;
+	const userId = GUEST_USER_ID;
 
 	useEffect(() => {
 		const checkIfSaved = async () => {
 			try {
-				if (!userId) return;
 				const isFavorite = await favoritesService.isFavorite(
 					userId,
 					recipeId as string
@@ -64,9 +62,7 @@ const RecipeDetailScreen = () => {
 			}
 		};
 
-		if (userId) {
-			checkIfSaved();
-		}
+		checkIfSaved();
 		loadRecipeDetail();
 	}, [recipeId, userId]);
 
@@ -77,7 +73,7 @@ const RecipeDetailScreen = () => {
 	};
 
 	const handleToggleSave = async () => {
-		if (!recipe || !userId) return;
+		if (!recipe) return;
 
 		setIsSaving(true);
 
