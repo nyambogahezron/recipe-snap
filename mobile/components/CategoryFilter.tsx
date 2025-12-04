@@ -74,28 +74,31 @@ export default function CategoryFilter({
 					};
 
 					return (
-						<AnimatedPressable
+						<Animated.View
 							key={category.id}
-							style={[
-								homeStyles.categoryButton,
-								isSelected && homeStyles.selectedCategory,
-								animatedButtonStyle,
-							]}
-							onPress={() => onSelectCategory(category.name)}
-							onPressIn={handlePressIn}
-							onPressOut={handlePressOut}
 							entering={FadeInRight.delay(index * 30).duration(300).springify()}
 						>
-							
-							<Text
+							<AnimatedPressable
 								style={[
-									homeStyles.categoryText,
-									isSelected && homeStyles.selectedCategoryText,
+									homeStyles.categoryButton,
+									isSelected && homeStyles.selectedCategory,
+									animatedButtonStyle,
 								]}
+								onPress={() => onSelectCategory(category.name)}
+								onPressIn={handlePressIn}
+								onPressOut={handlePressOut}
 							>
-								{category.name}
-							</Text>
-						</AnimatedPressable>
+
+								<Text
+									style={[
+										homeStyles.categoryText,
+										isSelected && homeStyles.selectedCategoryText,
+									]}
+								>
+									{category.name}
+								</Text>
+							</AnimatedPressable>
+						</Animated.View>
 					);
 				})}
 			</ScrollView>

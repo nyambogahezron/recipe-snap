@@ -29,6 +29,7 @@ import RecipeCard from '@/components/RecipeCard';
 import BackgroundWrapper from '@/components/BackgroundWrapper';
 import { CategoryData, Recipe } from '@/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -95,21 +96,23 @@ const HomeScreen = (): React.ReactElement => {
 				MealAPI.getRandomMeal(),
 			]);
 
-			const transformedCategories: CategoryData[] = apiCategories.map(
-				(cat, index) => ({
+			const transformedCategories: CategoryData[] = [
+				{
+					id: '0',
+					name: 'All',
+					image: '',
+				},
+				...apiCategories.map((cat, index) => ({
 					id: String(index + 1),
 					name: cat.strCategory,
 					image: cat.strCategoryThumb,
-					description: cat.strCategoryDescription,
-				})
-			);
+				})),
+			];
 
 			setCategories(transformedCategories);
 
 			// Set initial category only if not set
-			setSelectedCategory(
-				(prev) => prev || transformedCategories[0]?.name || null
-			);
+			setSelectedCategory((prev) => prev || 'All');
 
 			const transformedMeals = randomMeals
 				.map((meal) => MealAPI.transformMealData(meal))
@@ -144,7 +147,21 @@ const HomeScreen = (): React.ReactElement => {
 
 	const handleCategorySelect = async (category: string): Promise<void> => {
 		setSelectedCategory(category);
-		await loadCategoryData(category);
+		if (category === 'All') {
+			// Load random meals for "All" category
+			try {
+				const randomMeals = await MealAPI.getRandomMeals(12);
+				const transformedMeals = randomMeals
+					.map((meal) => MealAPI.transformMealData(meal))
+					.filter((meal): meal is Recipe => meal !== null);
+				setRecipes(transformedMeals);
+			} catch (error) {
+				console.error('Error loading random meals:', error);
+				setRecipes([]);
+			}
+		} else {
+			await loadCategoryData(category);
+		}
 	};
 
 	const onRefresh = async (): Promise<void> => {
@@ -155,7 +172,7 @@ const HomeScreen = (): React.ReactElement => {
 
 	useEffect(() => {
 		loadData();
-	}, []);
+	}, [loadData]);
 
 	if (loading && !refreshing)
 		return (
@@ -185,100 +202,104 @@ const HomeScreen = (): React.ReactElement => {
 				scrollEventThrottle={16}
 			>
 				<Animated.View style={[homeStyles.parallaxHeader, parallaxHeaderStyle]}>
-				{/* FEATURED SECTION */}
-				{featuredRecipe && (
-					<Animated.View
-						style={homeStyles.featuredSection}
-						entering={FadeInDown.delay(200).duration(500).springify()}
-					>
-						<AnimatedPressable
-							style={[homeStyles.featuredCard, featuredAnimatedStyle]}
-							onPress={() => router.push(`/recipe/${featuredRecipe.id}`)}
-							onPressIn={() => {
-								featuredScale.value = withSpring(0.98, {
-									damping: 15,
-									stiffness: 300,
-								});
-							}}
-							onPressOut={() => {
-								featuredScale.value = withSpring(1, {
-									damping: 15,
-									stiffness: 300,
-								});
-							}}
+					{/* FEATURED SECTION */}
+					{featuredRecipe && (
+						<Animated.View
+							style={homeStyles.featuredSection}
+							entering={FadeInDown.delay(200).duration(500).springify()}
 						>
-							<View style={homeStyles.featuredImageContainer}>
-								<Image
-									source={{ uri: featuredRecipe.image }}
-									style={homeStyles.featuredImage}
-									contentFit='cover'
-									transition={500}
-								/>
-								<View style={homeStyles.featuredOverlay}>
-									<Animated.View
-										style={homeStyles.featuredBadge}
-										entering={FadeInDown.delay(400).duration(400)}
-									>
-										<Text style={homeStyles.featuredBadgeText}>Featured</Text>
-									</Animated.View>
+							<AnimatedPressable
+								style={[homeStyles.featuredCard, featuredAnimatedStyle]}
+								onPress={() => router.push(`/recipe/${featuredRecipe.id}`)}
+								onPressIn={() => {
+									featuredScale.value = withSpring(0.98, {
+										damping: 15,
+										stiffness: 300,
+									});
+								}}
+								onPressOut={() => {
+									featuredScale.value = withSpring(1, {
+										damping: 15,
+										stiffness: 300,
+									});
+								}}
+							>
+								<View style={homeStyles.featuredImageContainer}>
+									<Image
+										source={{ uri: featuredRecipe.image }}
+										style={homeStyles.featuredImage}
+										contentFit='cover'
+										transition={500}
+									/>
+									<View style={homeStyles.featuredOverlay}>
+										<Animated.View
+											style={homeStyles.featuredBadge}
+											entering={FadeInDown.delay(400).duration(400)}
+										>
+											<Text style={homeStyles.featuredBadgeText}>Featured</Text>
+										</Animated.View>
 
-									<Animated.View
-										style={homeStyles.featuredContent}
-										entering={FadeInDown.delay(500).duration(400)}
-									>
-										<Text style={homeStyles.featuredTitle} numberOfLines={2}>
-											{featuredRecipe.title}
-										</Text>
+										<Animated.View
+											style={homeStyles.featuredContent}
+											entering={FadeInDown.delay(500).duration(400)}
+										>
+											<Text style={homeStyles.featuredTitle} numberOfLines={2}>
+												{featuredRecipe.title}
+											</Text>
 
-										<View style={homeStyles.featuredMeta}>
-											<View style={homeStyles.metaItem}>
-												<Ionicons
-													name='time-outline'
-													size={16}
-													color={COLORS.white}
-												/>
-												<Text style={homeStyles.metaText}>
-													{featuredRecipe.cookTime}
-												</Text>
-											</View>
-											<View style={homeStyles.metaItem}>
-												<Ionicons
-													name='people-outline'
-													size={16}
-													color={COLORS.white}
-												/>
-												<Text style={homeStyles.metaText}>
-													{featuredRecipe.servings}
-												</Text>
-											</View>
-											{featuredRecipe.area && (
+											<View style={homeStyles.featuredMeta}>
 												<View style={homeStyles.metaItem}>
 													<Ionicons
-														name='location-outline'
+														name='time-outline'
 														size={16}
 														color={COLORS.white}
 													/>
 													<Text style={homeStyles.metaText}>
-														{featuredRecipe.area}
+														{featuredRecipe.cookTime}
 													</Text>
 												</View>
-											)}
-										</View>
-									</Animated.View>
+												<View style={homeStyles.metaItem}>
+													<Ionicons
+														name='people-outline'
+														size={16}
+														color={COLORS.white}
+													/>
+													<Text style={homeStyles.metaText}>
+														{featuredRecipe.servings}
+													</Text>
+												</View>
+												{featuredRecipe.area && (
+													<View style={homeStyles.metaItem}>
+														<Ionicons
+															name='location-outline'
+															size={16}
+															color={COLORS.white}
+														/>
+														<Text style={homeStyles.metaText}>
+															{featuredRecipe.area}
+														</Text>
+													</View>
+												)}
+											</View>
+										</Animated.View>
+									</View>
 								</View>
-							</View>
-						</AnimatedPressable>
-					</Animated.View>
-				)}
+							</AnimatedPressable>
+						</Animated.View>
+					)}
 				</Animated.View>
 				{categories.length > 0 && (
-					<View style={homeStyles.stickyCategoryWrapper}>
-					<CategoryFilter
-						categories={categories}
-						selectedCategory={selectedCategory || ''}
-						onSelectCategory={handleCategorySelect}
-					/>
-					</View>
+					<LinearGradient
+						colors={['rgba(10, 7, 6, 0.2)', 'rgba(241, 111, 38, 0.35)', 'rgba(10, 7, 6, 0.9)']}
+						start={{ x: 0, y: 0 }}
+						end={{ x: 1, y: 1 }}
+						style={homeStyles.stickyCategoryWrapper}>
+						<CategoryFilter
+							categories={categories}
+							selectedCategory={selectedCategory || ''}
+							onSelectCategory={handleCategorySelect}
+						/>
+					</LinearGradient>
 				)}
 
 

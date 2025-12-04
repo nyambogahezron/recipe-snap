@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Bite Logo" width="200"/>
+</p>
+
 # 🍴 Bite - AI-Powered Recipe App
 
 > Snap a photo, get a recipe! Bite uses advanced AI to identify dishes and generate detailed recipes from your food photos.
@@ -8,7 +12,50 @@
 [![React Native](https://img.shields.io/badge/React%20Native-0.74-blue.svg)]()
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)]()
 
-A modern, AI-powered recipe application built with React Native and Express.js. Bite helps food enthusiasts discover recipes by simply taking photos of dishes they love.
+**A modern, AI-powered recipe application built with React Native and Express.js**
+
+[Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-api-documentation) • [Contributing](#-contributing)
+
+---
+
+## 📸 Screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="assets/screenshoots/01.jpg" alt="Home Screen" width="250"/><br/>
+        <b>Home Screen</b>
+      </td>
+      <td align="center">
+        <img src="assets/screenshoots/02.jpg" alt="AI Scanner" width="250"/><br/>
+        <b>AI Scanner</b>
+      </td>
+      <td align="center">
+        <img src="assets/screenshoots/03.jpg" alt="Recipe Details" width="250"/><br/>
+        <b>Recipe Details</b>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="assets/screenshoots/04.jpg" alt="Search" width="250"/><br/>
+        <b>Search Recipes</b>
+      </td>
+      <td align="center">
+        <img src="assets/screenshoots/05.jpg" alt="Favorites" width="250"/><br/>
+        <b>Favorites</b>
+      </td>
+      <td align="center">
+        <img src="assets/screenshoots/06.jpg" alt="Recipe Generated" width="250"/><br/>
+        <b>AI Generated Recipe</b>
+      </td>
+    </tr>
+  </table>
+</div>
+
+---
+
+---
 
 ## ✨ Features
 
@@ -16,227 +63,110 @@ A modern, AI-powered recipe application built with React Native and Express.js. 
 - **Dish Identification**: Instantly identify dishes from photos
 - **Recipe Generation**: Generate detailed recipes with ingredients and instructions
 - **Smart Analysis**: Powered by Google's advanced Gemini 2.0 Flash AI model
+- **High Accuracy**: Get precise dish names and cooking details
 
 ### 📱 Mobile Experience
 - **Cross-platform**: iOS and Android support with Expo
 - **Offline Storage**: Save recipes locally with SQLite
 - **Beautiful UI**: Modern, intuitive interface with smooth animations
 - **Photo Integration**: Seamless camera and gallery integration
+- **Fast & Responsive**: Optimized performance for smooth UX
+
+### 🔍 Discovery & Search
+- **Recipe Search**: Find recipes by name, ingredients, or cuisine
+- **Category Filtering**: Browse by meal type, cuisine, or difficulty
+- **Favorites**: Save and organize your favorite recipes
+- **Smart Suggestions**: Get personalized recipe recommendations
 
 ### 🔧 Developer Experience
 - **TypeScript**: Full type safety across the entire codebase
 - **Monorepo**: Organized workspace with pnpm for efficient development
 - **Clean Architecture**: Separation of concerns with clean code principles
 - **Hot Reload**: Fast development with instant feedback
+- **Well-Tested**: Comprehensive test coverage
 
-## 📁 Project Structure
+---
 
-```
-bite/
-├── 📱 mobile/              # React Native Expo app
-│   ├── app/               # App screens and navigation
-│   ├── components/        # Reusable UI components
-│   ├── services/          # API services and business logic
-│   ├── database/          # SQLite schema and migrations
-│   └── types/             # TypeScript type definitions
-├── 🚀 api/                # Express.js backend API
-│   ├── src/
-│   │   ├── ai/           # AI services and flows
-│   │   ├── controllers/  # Route controllers
-│   │   ├── middleware/   # Express middlewares
-│   │   └── routes/       # API route definitions
-│   └── dist/             # Compiled JavaScript output
-├── 📚 docs/              # Documentation
-├── 🔧 scripts/           # Build and utility scripts
-└── 📦 packages/          # Shared packages (future)
-```
+## 🛠️ Tech Stack
 
-## 🚀 Quick Start
+**Frontend (Mobile)**
 
-### Prerequisites
+![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
 
-Before you begin, ensure you have the following installed:
+**Backend (API)**
 
-- **Node.js** (v18 or higher) - [Download here](https://nodejs.org/)
-- **pnpm** (v10.16.1+) - Install with `npm install -g pnpm`
-- **Git** - For version control
-- **Google AI API Key** - [Get one here](https://ai.google.dev/)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)
+![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white)
+![Google AI](https://img.shields.io/badge/Google_AI-4285F4?style=for-the-badge&logo=google&logoColor=white)
 
-### Installation
+**Tools & Infrastructure**
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/nyambogahezron/bite.git
-   cd bite
-   ```
+![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)
 
-2. **Install dependencies**:
-   ```bash
-   pnpm install
-   ```
+---
 
-3. **Configure environment variables**:
-   ```bash
-   # Create environment file for API
-   cp api/.env.example api/.env
-   
-   # Edit api/.env with your configuration:
-   # PORT=5001
-   # NODE_ENV=development
-   # GOOGLE_GENAI_API_KEY=your_api_key_here
-   ```
+### 🎯 Key Architectural Principles
 
-4. **Start development servers**:
-   ```bash
-   # Start both API and mobile app
-   pnpm dev
-   
-   # Or start individually:
-   pnpm api:dev      # API server on http://localhost:5001
-   pnpm mobile:dev   # Mobile app with Expo
-   ```
+| Principle | Implementation | Benefits |
+|-----------|---------------|----------|
+| **Separation of Concerns** | Clean layered architecture | Easy maintenance and testing |
+| **Type Safety** | TypeScript across entire stack | Catch errors at compile time |
+| **Modularity** | Monorepo with workspaces | Independent scaling & deployment |
+| **Offline-First** | SQLite local storage | Works without internet |
+| **API-Driven** | RESTful API design | Platform-agnostic integration |
 
-### First Time Setup
+---
 
-1. **API Setup**: Make sure your Google AI API key is configured
-2. **Mobile Setup**: Install Expo Go app on your device for testing
-3. **Test Connection**: Verify API connectivity from mobile app
+### 📱 Mobile App Architecture
 
-## 🛠️ Development Commands
-
-### Universal Commands
-```bash
-# Start all development servers
-pnpm dev
-
-# Build all applications
-pnpm build
-
-# Run all tests
-pnpm test
-
-# Lint all code
-pnpm lint
-
-# Clean all build artifacts
-pnpm clean
-
-# Type checking across all workspaces
-pnpm type-check
-```
-
-### API-Specific Commands
-```bash
-# API development server (with hot reload)
-pnpm api:dev
-
-# Build API for production
-pnpm api:build
-
-# Start production API server
-pnpm api:start
-
-# API type checking
-pnpm api:type-check
-
-# API tests
-pnpm api:test
-```
-
-### Mobile-Specific Commands
-```bash
-# Start Expo development server
-pnpm mobile:dev
-
-# Start with specific platform
-pnpm mobile:ios      # iOS simulator
-pnpm mobile:android  # Android emulator
-pnpm mobile:web      # Web browser
-
-# Build for production
-pnpm mobile:build
-
-# Mobile tests
-pnpm mobile:test
-```
-
-## 📦 Advanced Workspace Management
-
-### Adding Dependencies
-
-```bash
-# Add dependency to specific workspace
-pnpm add <package> --filter api
-pnpm add <package> --filter mobile
-
-# Add dev dependency to root workspace
-pnpm add -D <package> -w
-
-# Add dependency to all workspaces
-pnpm add <package> --recursive
-```
-
-### Running Commands in Workspaces
-
-```bash
-# Run command in specific workspace
-pnpm --filter api <command>
-pnpm --filter mobile <command>
-
-# Run command in all workspaces
-pnpm --recursive <command>
-
-# Run command with workspace prefix
-pnpm -r --stream <command>  # Shows which workspace output comes from
-```
-
-### Workspace Filtering Examples
-
-```bash
-# Install dependencies for API only
-pnpm install --filter api
-
-# Build only mobile app
-pnpm build --filter mobile
-
-# Run tests for all workspaces with "test" in name
-pnpm test --filter "*test*"
-
-# Run lint for workspaces that changed
-pnpm lint --filter "[HEAD^1]"
-```
-
-## 🏗️ Architecture Overview
-
-### Mobile App (React Native + Expo)
-
-- **Framework**: Expo SDK with React Native
-- **Navigation**: Expo Router for file-based routing
-- **State Management**: React Context + Local State
+**Technology Stack:**
+- **Framework**: Expo SDK 51 with React Native
+- **Navigation**: Expo Router (file-based routing)
+- **State Management**: React Context API + Local State
 - **Database**: SQLite with Drizzle ORM
 - **Styling**: StyleSheet with custom design system
 - **AI Integration**: REST API calls to backend
+- **Image Handling**: Expo Image Picker & Camera
 
-### Backend API (Express.js + TypeScript)
 
+
+---
+
+### 🚀 Backend API Architecture
+
+**Technology Stack:**
 - **Runtime**: Bun (primary) / Node.js (fallback)
 - **Framework**: Express.js with TypeScript
 - **AI Engine**: Google Genkit with Gemini 2.0 Flash
-- **Architecture**: Clean Architecture with layered approach
-- **Validation**: Zod for request/response schemas
-- **Error Handling**: Centralized error middleware
+- **Validation**: Zod schemas for type-safe validation
+- **Error Handling**: Centralized middleware
+- **Architecture Pattern**: Clean Architecture
 
-### AI Processing Flow
 
-```mermaid
-graph LR
-    A[📱 Mobile App] --> B[📤 Image Upload]
-    B --> C[🔗 API Request]
-    C --> D[🤖 AI Processing]
-    D --> E[📊 Recipe Generation]
-    E --> F[📱 Display Results]
-    F --> G[💾 Local Storage]
-```
+---
+
+### 🤖 AI Processing Flow
+
+The AI processing pipeline handles image analysis and recipe generation:
+
+1. **Image Upload**: Mobile app captures/selects image → converts to Data URI
+2. **API Request**: Sends Data URI to backend endpoint
+3. **Validation**: Zod schema validates request format
+4. **AI Processing**: 
+   - Genkit routes request to Gemini 2.0 Flash
+   - Image is analyzed for dish identification
+   - Recipe is generated with structured output
+5. **Response**: Typed response sent back to mobile
+6. **Local Storage**: Recipe saved to SQLite for offline access
+
+
+---
 
 ## 🔧 Configuration
 
@@ -261,347 +191,7 @@ LOG_LEVEL=info
 # API endpoint is configured in mobile/constants/api.ts
 ```
 
-## 📊 API Documentation
-
-### Base URL
-```
-Development: http://localhost:5001
-Production: https://your-api-domain.com
-```
-
-### Authentication
-Currently, the API is open for development. Authentication will be added in future versions.
-
-### Endpoints
-
-#### POST `/api/ai/identify-dish`
-Identify a dish from an uploaded image.
-
-**Request Body:**
-```json
-{
-  "photoDataUri": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ..."
-}
-```
-
-**Response:**
-```json
-{
-  "dishName": "Spaghetti Carbonara",
-  "confidence": 0.95,
-  "cuisine": "Italian",
-  "description": "Classic Roman pasta dish..."
-}
-```
-
-#### POST `/api/ai/generate-recipe`
-Generate a detailed recipe from a food image.
-
-**Request Body:**
-```json
-{
-  "photoDataUri": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ..."
-}
-```
-
-**Response:**
-```json
-{
-  "title": "Homemade Spaghetti Carbonara",
-  "description": "A creamy, authentic Italian pasta dish...",
-  "prepTime": "15 minutes",
-  "cookTime": "20 minutes",
-  "servings": 4,
-  "difficulty": "Medium",
-  "ingredients": [
-    {
-      "name": "Spaghetti",
-      "amount": "400",
-      "unit": "grams"
-    }
-  ],
-  "instructions": [
-    {
-      "step": 1,
-      "instruction": "Bring a large pot of salted water to boil..."
-    }
-  ],
-  "tips": ["Use fresh eggs for best results..."],
-  "nutrition": {
-    "calories": 520,
-    "protein": 22,
-    "carbs": 58,
-    "fat": 23
-  }
-}
-```
-
-### Error Responses
-```json
-{
-  "error": "Validation failed",
-  "details": ["photoDataUri must be a valid data URI"]
-}
-```
-
-## 🧪 Testing
-
-### Running Tests
-
-```bash
-# All tests
-pnpm test
-
-# Watch mode
-pnpm test:watch
-
-# Coverage report
-pnpm test:coverage
-
-# API tests only
-pnpm api:test
-
-# Mobile tests only
-pnpm mobile:test
-```
-
-### Test Structure
-
-```typescript
-// Example API test
-describe('AI Controller', () => {
-  it('should identify dish from image', async () => {
-    const response = await request(app)
-      .post('/api/ai/identify-dish')
-      .send({ photoDataUri: mockImageData })
-      .expect(200);
-    
-    expect(response.body).toHaveProperty('dishName');
-    expect(response.body.confidence).toBeGreaterThan(0.5);
-  });
-});
-
-// Example mobile component test
-describe('RecipeCard', () => {
-  it('renders recipe information correctly', () => {
-    render(<RecipeCard recipe={mockRecipe} />);
-    
-    expect(screen.getByText(mockRecipe.title)).toBeInTheDocument();
-    expect(screen.getByText(mockRecipe.description)).toBeInTheDocument();
-  });
-});
-```
-
-## 📱 Mobile App Features
-
-### Screen Overview
-
-- **🏠 Home**: Recipe discovery and featured content
-- **📸 AI Scanner**: Camera integration for dish identification
-- **🔍 Search**: Search existing recipes and ingredients
-- **❤️ Favorites**: Saved recipes and personal collection
-- **👤 Profile**: User settings and preferences
-
-### Key Components
-
-- **📱 RecipeCard**: Displays recipe information with image
-- **🤖 AIRecipeCard**: Shows AI-generated recipe details
-- **📋 RecipeBottomSheet**: Full recipe view in modal
-- **🔄 LoadingSpinner**: Consistent loading states
-- **💀 Skeletons**: Loading placeholders for better UX
-
-## 🎨 Design System
-
-### Colors
-```typescript
-export const colors = {
-  primary: '#FF6B6B',      // Main brand color
-  secondary: '#4ECDC4',    // Accent color
-  background: '#F8F9FA',   // Light background
-  surface: '#FFFFFF',      // Card backgrounds
-  text: '#2D3436',         // Primary text
-  textLight: '#636E72',    // Secondary text
-  error: '#E74C3C',        // Error states
-  success: '#00B894',      // Success states
-  warning: '#FDCB6E',      // Warning states
-};
-```
-
-### Typography
-```typescript
-export const fonts = {
-  regular: 'Inter-Regular',
-  medium: 'Inter-Medium',
-  bold: 'Inter-Bold',
-  sizes: {
-    small: 12,
-    medium: 14,
-    large: 16,
-    xlarge: 20,
-    xxlarge: 24,
-  },
-};
-```
-
-## 🚀 Deployment
-
-### API Deployment
-
-```bash
-# Build for production
-pnpm api:build
-
-# Start production server
-pnpm api:start
-
-# Or use Docker
-docker build -t bite-api .
-docker run -p 5001:5001 bite-api
-```
-
-### Mobile App Deployment
-
-```bash
-# Build for app stores
-npx eas build --platform all
-
-# Submit to stores
-npx eas submit --platform all
-
-# Or build locally
-npx expo export --platform all
-```
-
-### Environment Configuration
-
-```bash
-# Production environment variables
-NODE_ENV=production
-PORT=5001
-GOOGLE_GENAI_API_KEY=prod_api_key
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTIONS.md) for details.
-
-### Quick Contribution Steps
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes
-4. Add tests for new functionality
-5. Ensure all tests pass: `pnpm test`
-6. Commit your changes: `git commit -m 'Add amazing feature'`
-7. Push to your fork: `git push origin feature/amazing-feature`
-8. Create a Pull Request
-
-### Development Guidelines
-
-- Follow TypeScript best practices
-- Write tests for new features
-- Use conventional commit messages
-- Update documentation as needed
-- Ensure code passes linting: `pnpm lint`
-
-## 📋 Roadmap
-
-### Version 1.1 (Q1 2024)
-- [ ] User authentication and profiles
-- [ ] Recipe sharing and social features
-- [ ] Advanced filtering and search
-- [ ] Offline recipe generation
-
-### Version 1.2 (Q2 2024)
-- [ ] Meal planning features
-- [ ] Shopping list generation
-- [ ] Nutritional analysis
-- [ ] Recipe ratings and reviews
-
-### Version 2.0 (Q3 2024)
-- [ ] Multi-language support
-- [ ] Video recipe tutorials
-- [ ] Advanced AI cooking assistant
-- [ ] Integration with smart kitchen devices
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### API Connection Errors
-```bash
-# Check if API is running
-curl http://localhost:5001/health
-
-# Verify environment variables
-cat api/.env
-
-# Restart development server
-pnpm api:dev
-```
-
-#### Mobile App Issues
-```bash
-# Clear Expo cache
-npx expo start --clear
-
-# Reset Metro bundler
-npx expo start --reset-cache
-
-# Verify dependencies
-pnpm install
-```
-
-#### Build Errors
-```bash
-# Clean and rebuild
-pnpm clean
-pnpm install
-pnpm build
-
-# Check TypeScript errors
-pnpm type-check
-```
-
-### Getting Help
-
-- 📖 Check [Documentation](docs/)
-- 🐛 Report [Issues](ISSUES.md)
-- 💬 Join [Discussions](https://github.com/nyambogahezron/bite/discussions)
-- 📧 Contact maintainers
-
-## 📚 Additional Resources
-
-- **API Documentation**: [api/README.md](api/README.md)
-- **Mobile Setup**: [mobile/README.md](mobile/README.md)
-- **Contributing**: [CONTRIBUTIONS.md](CONTRIBUTIONS.md)
-- **Security**: [SECURITY.md](SECURITY.md)
-- **Code of Conduct**: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Google AI** for providing the Gemini AI model
-- **Expo Team** for the amazing React Native framework
-- **Open Source Community** for the incredible tools and libraries
-- **Contributors** who help make this project better
-
-## 📊 Project Stats
-
-![GitHub stars](https://img.shields.io/github/stars/nyambogahezron/bite?style=social)
-![GitHub forks](https://img.shields.io/github/forks/nyambogahezron/bite?style=social)
-![GitHub issues](https://img.shields.io/github/issues/nyambogahezron/bite)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/nyambogahezron/bite)
-
----
-
-<div align="center">
-
-**Made with ❤️ by [Hezron Nyamboga](https://github.com/nyambogahezron)**
-
-[⬆️ Back to top](#-bite---ai-powered-recipe-app)
-
-</div>
