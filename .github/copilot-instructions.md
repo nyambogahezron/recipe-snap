@@ -1,54 +1,191 @@
-## Bite — Copilot Instructions
+# GitHub Copilot Instructions for Bite
 
-This repo is a pnpm monorepo with two primary apps: `api` (AI backend) and `mobile` (Expo React Native app).
+## Project Overview
+Bite is an AI-powered recipe app with a **monorepo architecture** containing two distinct workspaces:
+- **`api/`**: Express.js backend (Bun runtime) handling AI processing via Google Genkit + Gemini 2.0 Flash
+- **`mobile/`**: Expo/React Native app with SQLite for local storage
 
-Keep guidance concise and specific to this codebase. Use the examples and file references below when making changes.
+**Critical Architecture Principle**: The API is **stateless** and focuses solely on AI operations. All data persistence happens client-side in SQLite on the mobile device.
 
-Core facts
-- Monorepo managed with pnpm (see root `README.md`). Use `pnpm install` at repo root. Use `pnpm dev` or workspace filters (e.g. `pnpm api:dev`, `pnpm mobile:dev`).
-- API runtime commonly runs with Bun but Node/npm is supported. API scripts are in `api/package.json` (`dev`, `build`, `start`, `type-check`).
-- Mobile app is an Expo app in `mobile/` (use `expo start`).
+## Workspace Commands
 
-API architecture (what to know)
-- Entry: `api/src/server.ts` — Express server, mounts routes at `/api` and uses centralized error and 404 middleware (`api/src/middleware`).
-- AI layer: `api/src/ai/ai-instance.ts` configures `genkit` + `@genkit-ai/googleai`. Model: `googleai/gemini-2.0-flash`.
-- Flows & prompts: each AI operation is implemented under `api/src/ai/flows/` using `ai.definePrompt` and `ai.defineFlow`.
-  - Example flows: `identify-dish-from-image.ts`, `generate-recipe-from-image.ts` — both expect `photoDataUri` (data URI, base64) and return typed outputs (zod schemas).
-- Config: environment variables consumed via `api/src/config/env.ts` — notably `GOOGLE_GENAI_API_KEY` and `PORT`.
+### API Development
+```bash
+cd api
+bun dev              # Development with hot reload
+bun build            # Build TypeScript to dist/
+bun start            # Run production build
+bun type-check       # TypeScript validation
+```
 
-Request shapes & integration points
-- Mobile calls the API endpoints described in `api/README.md`:
-  - POST `/api/ai/identify-dish` with JSON { "photoDataUri": "data:image/jpeg;base64,..." }
-  - POST `/api/ai/generate-recipe` same shape
-- The backend expects Data URIs that include MIME type and base64 encoding. See zod schemas in `api/src/ai/flows/*` for exact validation rules.
+### Mobile Development
+```bash
+cd mobile
+bun dev              # Start Expo dev server
+bun android          # Run on Android
+bun ios              # Run on iOS
+```
 
-Conventions & patterns
-- Use the zod schemas defined in flows for input/output contracts. They are authoritative — prefer updating them when changing shapes.
-- Error handling is centralized. Use `api/src/utils/errors.ts` and middlewares in `api/src/middleware` to produce consistent responses.
-- No DB in the API; the app is stateless. Persistence occurs on the mobile client (see `mobile/database/`).
-- TypeScript-first: run `pnpm --filter api run type-check` (or `bun run type-check`) before publishing API changes.
+## AI Integration Pattern (Genkit + Gemini)
 
-Build & dev notes
-- Root-level dev: `pnpm dev` (runs both apps in development). To target the API: `pnpm api:dev` (runs Bun or `npm run dev` depending on environment).
-- API build uses Bun: `bun build src/server.ts --outdir dist --target node` (script: `pnpm --filter api run build`).
-- Mobile: `expo start` (see `mobile/package.json` scripts).
+All AI features use **Google Genkit flows** with strict Zod schema validation:
 
-When editing AI prompts/flows
-- Update the zod input/output schemas in the same file and keep prompts short and deterministic.
-- Keep prompts idempotent and map outputs to the declared output schema — `ai.definePrompt` and `ai.defineFlow` expect exact schemas.
+### Creating a New AI Flow
+1. Define in `api/src/ai/flows/<feature-name>.ts`:
+```typescript
+import { ai } from '../ai-instance.js';
+import { z } from 'zod';
 
-Files to check for changes / quick references
-- Server & routes: `api/src/server.ts`, `api/src/routes/index.ts`, `api/src/controllers/aiController.ts`
-- AI: `api/src/ai/ai-instance.ts`, `api/src/ai/flows/*`
-- Config: `api/src/config/env.ts`
-- Middlewares: `api/src/middleware/*`
-- Mobile integration: `mobile/app/api/*` and `mobile/app/recipe/[id].tsx`
+const InputSchema = z.object({
+  photoDataUri: z.string().describe('Data URI with base64 image')
+});
 
-Security & secrets
-- Do not hardcode API keys. The Google GenAI key must be provided via `GOOGLE_GENAI_API_KEY` in env or secrets manager. See `api/README.md`.
+const OutputSchema = z.object({
+  result: z.string()
+});
 
-PR & testing notes
-- Prefer small, focused changes when editing prompts or schemas. Update types and run `pnpm --filter api run type-check`.
-- Run the API locally and exercise endpoints with a real data URI (small base64 sample) to verify zod schemas and prompt outputs.
+// Define prompt with Genkit's structured format
+const prompt = ai.definePrompt({
+  name: 'myFeaturePrompt',
+  input: { schema: InputSchema },
+  output: { schema: OutputSchema },
+  prompt: `Your instruction here. Image: {{media url=photoDataUri}}`
+});
 
-If anything is unclear or you need more examples (sample Data URIs, test harnesses, or common failure modes), ask and I'll add them.
+// Define flow
+const myFlow = ai.defineFlow({
+  name: 'myFeatureFlow',
+  inputSchema: InputSchema,
+  outputSchema: OutputSchema,
+}, async (input) => {
+  const { output } = await prompt(input);
+  return output!;
+});
+```
+
+2. Export wrapper function with validation (see `identify-dish-from-image.ts` for reference)
+3. Add controller method in `api/src/controllers/aiController.ts` using `AsyncHandler`
+4. Register route in `api/src/routes/aiRoutes.ts`
+
+**Key Pattern**: Always validate Data URI format (`data:<mimetype>;base64,<encoded_data>`) before processing.
+
+## Data Flow Architecture
+
+### Image → Recipe Pipeline
+```
+Mobile (Expo Image Picker) 
+  → Convert to Data URI
+  → POST to API endpoint
+  → Genkit validates with Zod
+  → Gemini 2.0 processes image
+  → Structured JSON response
+  → Mobile saves to SQLite (aiRecipes table)
+```
+
+### Database Schema (SQLite - mobile only)
+- **`favorites`**: External recipe bookmarks (from MealDB API)
+- **`aiRecipes`**: AI-generated recipes stored as:
+  - `ingredients`: JSON string array
+  - `instructions`: JSON string array
+  - `imageData`: Base64 encoded image
+  - `userId`: Guest user ID (see `mobile/constants/guestUser.ts`)
+
+**Important**: When querying AI recipes, always `JSON.parse()` the ingredients/instructions fields (see `mobile/database/services/aiRecipesService.ts`).
+
+## Error Handling Conventions
+
+### API Side
+Use custom error classes from `api/src/utils/errors.ts`:
+```typescript
+import { BadRequestError, NotFoundError } from '../utils/errors.js';
+
+throw new BadRequestError('Missing photoDataUri');
+```
+
+Wrap async route handlers with `AsyncHandler` to auto-catch errors:
+```typescript
+import AsyncHandler from '../middleware/AsyncHandler.js';
+
+static myRoute = AsyncHandler(async (req, res) => { /* ... */ });
+```
+
+### Mobile Side
+Service methods return typed response objects:
+```typescript
+type AIServiceResponse<T> = {
+  success: boolean;
+  data?: T;
+  error?: string;
+};
+```
+
+## Mobile App Navigation
+
+Uses **Expo Router** (file-based routing):
+- `app/(tabs)/_layout.tsx` - Tab navigation structure
+- `app/(tabs)/index.tsx` - Home screen
+- `app/(tabs)/ai.tsx` - AI scanner screen
+- `app/recipe/[id].tsx` - Dynamic recipe detail page
+
+**Pattern**: Screens import styles from `assets/styles/<screen-name>.styles.ts` for consistency.
+
+## TypeScript Conventions
+
+1. **Shared Types**: Define request/response types in both workspaces
+   - API: `api/src/types/api.ts`
+   - Mobile: `mobile/types/ai.ts`
+
+2. **Schema-First Development**: Zod schemas are source of truth
+   ```typescript
+   const Schema = z.object({ /* ... */ });
+   type MyType = z.infer<typeof Schema>;
+   ```
+
+3. **File Extensions**: API uses `.js` imports for ESM compatibility (despite `.ts` files)
+   ```typescript
+   import { ai } from '../ai-instance.js'; // Correct
+   ```
+
+## Environment Configuration
+
+### API (.env)
+```bash
+GOOGLE_GENAI_API_KEY=your_key  # Required for AI features
+PORT=5001                       # Optional, defaults to 5001
+```
+
+### Mobile
+- API URL: Set `EXPO_PUBLIC_API_URL` in `.env` or defaults in `constants/api.ts`
+- No secrets stored client-side - all AI keys remain in backend
+
+## Testing AI Features Locally
+
+1. Start API: `cd api && bun dev`
+2. Get local IP from terminal output (e.g., `http://192.168.x.x:5001`)
+3. Update `mobile/constants/api.ts` with your IP
+4. Run mobile: `cd mobile && bun dev`
+5. Test image upload in AI tab
+
+**Troubleshooting**: If AI returns mock data, check `GOOGLE_GENAI_API_KEY` is set in `api/.env`.
+
+## Common Patterns
+
+### Adding a New Database Table (Mobile)
+1. Add table definition in `mobile/database/schema.ts`
+2. Create migration: `bun drizzle-kit generate`
+3. Add service in `mobile/database/services/<table>Service.ts`
+4. Export from `mobile/database/services/index.ts`
+
+### API Request Timeout Handling
+Backend enforces 30s timeout (see `api/src/server.ts`). For long AI operations, consider:
+- Streaming responses (not yet implemented)
+- Polling-based status checks
+- Optimizing prompts for faster Gemini responses
+
+## Key Files to Reference
+
+- **AI Setup**: `api/src/ai/ai-instance.ts`
+- **Example Flow**: `api/src/ai/flows/generate-recipe-from-image.ts`
+- **Mobile AI Service**: `mobile/services/ai/aiService.ts`
+- **Database Schema**: `mobile/database/schema.ts`
+- **Error Handling**: `api/src/middleware/errorHandler.ts`
