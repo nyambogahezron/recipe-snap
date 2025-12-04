@@ -109,10 +109,6 @@ export interface LoadingSpinnerProps {
 	color?: string;
 }
 
-export interface SafeScreenProps {
-	children: React.ReactNode;
-}
-
 // Hook Types
 export interface UseDebounceResult<T> {
 	debouncedValue: T;

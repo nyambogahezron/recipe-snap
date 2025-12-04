@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity,  ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { GenerateRecipeFromImageOutput, IdentifyDishFromImageOutput, AIFeature } from '@/types/ai';
@@ -17,7 +17,7 @@ export default function RecipeResults({ results, onSaveRecipe, isSaving = false 
   if (results.type === 'identify-dish') {
 		const data = results.data as IdentifyDishFromImageOutput;
 		return (
-			<View style={styles.container}>
+			<View>
 				<View style={styles.header}>
 					<Text style={styles.headerIcon}>🍽️</Text>
 					<Text style={styles.headerTitle}>Dish Identified!</Text>
@@ -35,7 +35,7 @@ export default function RecipeResults({ results, onSaveRecipe, isSaving = false 
 
 	const data = results.data as GenerateRecipeFromImageOutput;
 	return (
-		<View style={styles.container}>
+		<View>
 			{/* Header */}
 			<View style={styles.header}>
 				<Text style={styles.headerIcon}>👨‍🍳</Text>
@@ -99,15 +99,13 @@ export default function RecipeResults({ results, onSaveRecipe, isSaving = false 
 }
 
 const styles = StyleSheet.create({
-	container: {
-		// No flex: 1 needed since parent ScrollView handles scrolling
-	},
+	
 	header: {
 		alignItems: 'center',
 		marginBottom: 20,
 		paddingBottom: 20,
-		borderBottomWidth: 1,
-		borderBottomColor: '#f0f0f0',
+		borderBottomWidth: 0.3,
+		borderBottomColor: COLORS.accent,
 	},
 	headerIcon: {
 		fontSize: 48,

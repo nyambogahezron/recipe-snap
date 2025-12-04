@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -20,10 +20,20 @@ import { router } from "expo-router";
 import { COLORS } from "@/constants/colors";
 import { FONTS } from "@/constants/fonts";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
+const WELCOME_SEEN_KEY = "@welcome_seen";
+
 export default function Welcome() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    checkWelcomeStatus();
+  }, []);
+
+ 
   // Animation values
   const fadeAnim = useSharedValue(0);
   const slideAnim = useSharedValue(50);
@@ -110,6 +120,35 @@ export default function Welcome() {
     ],
   }));
 
+
+   const checkWelcomeStatus = async () => {
+    try {
+      const hasSeenWelcome = await AsyncStorage.getItem(WELCOME_SEEN_KEY);
+      if (hasSeenWelcome === "true") {
+        router.replace("/(tabs)");
+      } else {
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Error checking welcome status:", error);
+      setIsLoading(false);
+    }
+  };
+
+  const handleGetStarted = async () => {
+    try {
+      await AsyncStorage.setItem(WELCOME_SEEN_KEY, "true");
+      router.replace("/(tabs)");
+    } catch (error) {
+      console.error("Error saving welcome status:", error);
+      router.replace("/(tabs)");
+    }
+  };
+
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <BlurView intensity={40} style={{ ...StyleSheet.absoluteFillObject }}>
@@ -142,7 +181,7 @@ export default function Welcome() {
             <TouchableOpacity
               style={styles.viewMenuButton}
               activeOpacity={0.8}
-              onPress={() => router.push("/(tabs)")}
+              onPress={handleGetStarted}
             >
               <Text style={styles.viewMenuText}>Get Started</Text>
               <ArrowRight size={20} color="#fff" style={styles.arrowIcon} />

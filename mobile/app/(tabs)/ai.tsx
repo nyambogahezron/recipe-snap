@@ -1,5 +1,4 @@
 import { aiStyles } from '@/assets/styles/ai.styles';
-import SafeScreen from '@/components/SafeScreen';
 import RecipeBottomSheet from '@/components/RecipeBottomSheet';
 import RecipeLoading from '@/components/RecipeLoading';
 import RecipeResults from '@/components/RecipeResults';
@@ -23,6 +22,7 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
+import BackgroundWrapper from '@/components/BackgroundWrapper';
 
 export default function AIScreen() {
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -209,7 +209,7 @@ export default function AIScreen() {
 
 
 	return (
-		<SafeScreen>
+		<BackgroundWrapper statusBarStyle='light-content' overlayOpacity={0.4}>
 			<ScrollView
 				style={aiStyles.container}
 				contentContainerStyle={aiStyles.scrollContent}
@@ -345,6 +345,6 @@ export default function AIScreen() {
 					/>
 				) : null}
 			</RecipeBottomSheet>
-		</SafeScreen>
+		</BackgroundWrapper>
 	);
 }

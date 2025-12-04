@@ -221,8 +221,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: 20,
 		paddingBottom: 16,
-		borderBottomWidth: 1,
-		borderBottomColor: COLORS.border,
+		borderBottomWidth: 0.3,
+		borderBottomColor: COLORS.accent,
 	},
 	title: {
 		fontSize: 20,

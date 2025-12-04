@@ -15,7 +15,7 @@ interface BackgroundWrapperProps {
 	safeAreaTop?: boolean;
 	safeAreaBottom?: boolean;
 	useGradientBackground?: boolean;
-	gradientColors?: string[];
+	gradientColors?: [string, string, ...string[]];
 	gradientStart?: { x: number; y: number };
 	gradientEnd?: { x: number; y: number };
 }
@@ -30,7 +30,7 @@ export default function BackgroundWrapper({
 	safeAreaTop = true,
 	safeAreaBottom = false,
 	useGradientBackground = true,
-	gradientColors = ['rgba(241, 111, 38, 0.35)', 'rgba(10, 7, 6, 0.9)'],
+	gradientColors = ['rgba(241, 111, 38, 0.35)', 'rgba(10, 7, 6, 0.9)'] as [string, string],
 	gradientStart = { x: 0, y: 0 },
 	gradientEnd = { x: 1, y: 1 },
 }: BackgroundWrapperProps) {
@@ -65,7 +65,7 @@ export default function BackgroundWrapper({
 			<StatusBar
 				barStyle={statusBarStyle}
 				translucent
-				backgroundColor='transparent'
+				backgroundColor='rgba(10, 7, 6, 0.9)'
 			/>
 
 			<View 
