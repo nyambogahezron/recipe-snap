@@ -1,0 +1,126 @@
+{
+  "info": {
+    "name": "Bite API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0",
+    "description": "Postman collection for Bite API (AI endpoints) with basic tests"
+  },
+  "item": [
+    {
+      "name": "Identify Dish",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"photoDataUri\": \"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD...\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/ai/identify-dish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "ai",
+            "identify-dish"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response has success true', function () { var json = pm.response.json(); pm.expect(json.success).to.eql(true); });",
+              "pm.test('Response has dishName and confidence', function () { var d = pm.response.json().data; pm.expect(d).to.have.property('dishName'); pm.expect(d).to.have.property('confidence'); pm.expect(pm.typeOf(d.dishName)).to.eql('string'); pm.expect(pm.typeOf(d.confidence)).to.eql('number'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Generate Recipe From Image",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"photoDataUri\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/ai/generate-recipe",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "ai",
+            "generate-recipe"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response success true and recipe present', function () { var json = pm.response.json(); pm.expect(json.success).to.eql(true); pm.expect(json.data).to.have.property('recipeName'); pm.expect(json.data).to.have.property('ingredients'); pm.expect(json.data).to.have.property('instructions'); pm.expect(Array.isArray(json.data.ingredients)).to.eql(true); pm.expect(Array.isArray(json.data.instructions)).to.eql(true); pm.expect(json.data.ingredients.length).to.be.above(0); pm.expect(json.data.instructions.length).to.be.above(0); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search Recipes",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"searchQuery\": \"chicken curry\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/ai/search-recipes",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "ai",
+            "search-recipes"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response success true', function () { var json = pm.response.json(); pm.expect(json.success).to.eql(true); });",
+              "pm.test('Data contains recipes array', function () { var d = pm.response.json().data; pm.expect(d).to.have.property('recipes'); pm.expect(Array.isArray(d.recipes)).to.eql(true); pm.expect(d).to.have.property('searchTerm'); pm.expect(typeof d.searchTerm).to.eql('string'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
