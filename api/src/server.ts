@@ -31,6 +31,10 @@ app.use(cors());
 
 app.use('/api', routes);
 
+app.get('/', (_req, res) => {
+	res.send('API is running');
+});
+
 app.use(NotFoundHandler);
 
 app.use(ErrorHandlerMiddleware);
